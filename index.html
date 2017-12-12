@@ -1,1 +1,66 @@
-piyo!
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>pixereum</title>
+	<link rel="stylesheet" href="./css/main.css">
+	<link rel="stylesheet" href="./css/iziModal.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="./js/web3.min.js"></script>
+	<script src="./js/iziModal.min.js"></script>
+</head>
+<body>
+
+	<div id="container">
+	
+		<div id="menu_box">
+			<h1 id="title">Pixereum</h1>
+			<div id="info_panel">
+				<p>number of pixels: <label id="info_pixel_num"></label></p>
+				<p>x: <label id="info_pixel_x"></label> y: <label id="info_pixel_y"></label></p>
+			</div>
+			<div id="links">
+				<p><a href="#about" class="about_trigger">about this project</a> | <a href="https://goo.gl/4u2AAW" target="_blank">how to get your pixel</a> | <a href="https://github.com/piyolab/pixereum" target="_blank">github</a></p>
+			</div>
+		</div>
+
+
+
+		<div id="main_box">
+		</div>
+
+	</div>
+
+	<div id="modal_about" class="modal">
+		<h2>What's this?</h2>
+		<p>This is an experimental Ethereum based smart contract project (for me to learn Smart Contracts).</p>
+		<p>Inspired by <a href="http://www.milliondollarhomepage.com/" target="_blank">http://www.milliondollarhomepage.com</a></p>
+
+		<h2>What you can do?</h2>
+		<ul>
+			<li>You can be a holder of pixels by sending Ether.</li>
+			<li>Holders of each pixels can set any color they want.</li>
+			<li>They can also set a message to each pixels they own.</li>
+			<li>If you want, you can set any price to a pixel you own and sell it.</li>
+		</ul>
+	</div>
+
+	<div id="modal_pixel_detail" class="modal">
+		<p>x: <label id="modal_pixel_detail_x" class="modal_pixel_detail_value"></label></p>
+		<p>y: <label id="modal_pixel_detail_y" class="modal_pixel_detail_value"></label></p>
+		<p>x (hex): <label id="modal_pixel_detail_hex_x" class="modal_pixel_detail_value"></label></p>
+		<p>y (hex): <label id="modal_pixel_detail_hex_y" class="modal_pixel_detail_value"></label></p>		
+		<p>pixel number: <label id="modal_pixel_detail_pixel_number" class="modal_pixel_detail_value"></label> </p>
+		<p>color code (hex): <label id="modal_pixel_detail_color_hex" class="modal_pixel_detail_value"></label></p>
+		<p>color code (int): <label id="modal_pixel_detail_color_int" class="modal_pixel_detail_value"></label></p>
+		<p>message: <label id="modal_pixel_detail_message" class="modal_pixel_detail_value"></label></p>
+		<p>owner: <label id="modal_pixel_detail_owner" class="modal_pixel_detail_value"></label></p>
+		<p>sale?: <label id="modal_pixel_detail_sale" class="modal_pixel_detail_value"></label></p>
+		<p>current price (ETH): <label id="modal_pixel_detail_price" class="modal_pixel_detail_value"></label></p>
+	</div>
+
+	<script type="text/javascript" src="./js/main.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+html, body, h1, p, div {
+    margin: 0;
+    padding: 0;
+    font-size: 100%;
+ 	font-family: "HelveticaNeue";
+}
+
+body {
+}
+
+ a:link {
+ 	color: #000000;
+ }
+
+a:visited {
+	color: #000000; 
+}
+
+a:active {
+	color: #000000; 
+}
+a:hover {
+	color: #000000; 
+}
+
+#container {
+	margin: 0 auto;
+	width: 1200px;
+}
+
+#menu_box {
+	margin: 0px;
+	padding: 0px;
+	position: fixed;
+	top: 0;
+	z-index: 100;
+	background-color: #FFFFFF;
+	width: 1200px;
+	height: 80px;
+	display: table;
+}
+
+#title {
+	display: table-cell;
+	vertical-align: middle;
+	width: 200px;
+	padding-left: 4px;
+    font-size: 200%;
+ 	font-family: "HelveticaNeue-Thin", "Helvetica Neue Thin", "Helvetica Neue";
+ 	font-weight: 100;
+ 	letter-spacing: 3px;
+}
+
+#info_panel {
+	display: table-cell;
+	vertical-align: middle;
+}
+
+#links {
+	display: table-cell;
+	vertical-align: middle;
+}
+
+#main_box {
+	margin: 0px;
+	margin-top: 80px;
+	padding: 0px;
+}
+
+#canvas {
+	margin: 0px;
+	padding: 0px;
+}
+
+.modal {
+	display: none;
+}
+
+.modal_pixel_detail_value {
+	font-style: italic;
+	color: #909090: 
+}
