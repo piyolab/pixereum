@@ -128,9 +128,24 @@ function initApp() {
 				$('#modal_pixel_detail_message').text(pixelData.message);
 				$('#modal_pixel_detail_message').addAutoLink();
 				if (pixelData.isSale) {
-					$('#modal_pixel_detail_sale').text("for sale");	
+					$('#modal_pixel_detail_sale').text("for sale");
+
+					if(pixereum.isMetaMask) {
+						$('#modal_pixel_buy').click(function(e) {
+							console.log("buy");
+							data = "0x" + pixelData.hexX + pixelData.hexY + "FFFFFF";
+							console.log("CONTRACT_ADDRESS: " + CONTRACT_ADDRESS);
+							console.log("data: " + data);
+							web3.eth.sendTransaction({to: CONTRACT_ADDRESS, data: data, value: web3.toWei(pixelData.ethPrice, "ether"), gasLimit: 200000}, function(error, transactionHash) {
+		  						if (!error) {
+		  							console.log(transactionHash);
+		  						}
+							});
+						});	
+					}
 				} else {
 					$('#modal_pixel_detail_sale').text("not for sale");
+					$('#modal_pixel_buy').hide();
 				}
 				$('#modal_pixel_detail_price').text(pixelData.ethPrice);
 			    $('#modal_pixel_detail').iziModal('stopLoading');
@@ -173,6 +188,7 @@ window.addEventListener('load', function() {
     // Use Mist/MetaMask's provider
     console.log('Using MetaMask!')
     window.web3 = new Web3(web3.currentProvider);
+    pixereum.isMetaMask = true;
   } else {
     console.log('No web3? You should consider trying MetaMask!')
     // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
