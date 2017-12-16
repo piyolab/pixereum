@@ -79,6 +79,12 @@ function addGrid(canvas, context){
 	context.stroke();
 }
 
+(function($) {
+  $.fn.addAutoLink = function() {
+  	$(this).html( $(this).html().replace(/((http|https):\/\/[\w?=&.\/-;#~%-]+(?![\w\s?&.\/;#~%"=-]*>))/g, '<a href="$1" target="_blank">$1</a>') );
+  };
+})(jQuery);
+
 // get pixel colors from smart contract
 // and render pixels
 var res = pixereum.contract.getColors.call();
@@ -121,6 +127,7 @@ canvas.on('click', function(e) {
 	$('#modal_pixel_detail_color_int').text(pixereum.pixels[x][y].intColor);
 	$('#modal_pixel_detail_owner').text(pixelData.owner);
 	$('#modal_pixel_detail_message').text(pixelData.message);
+	$('#modal_pixel_detail_message').addAutoLink();
 	if (pixelData.isSale) {
 		$('#modal_pixel_detail_sale').text("for sale");	
 	} else {
