@@ -60,6 +60,13 @@ function addGrid(canvas, context){
 	context.stroke();
 }
 
+function getMousePosition(e) {
+	var rect = e.target.getBoundingClientRect();
+	var x = e.clientX - rect.left <= 0 ? 0 : Math.floor((e.clientX - rect.left) / PIXEL_SIZE);
+	var y = e.clientY - rect.top <= 0 ? 0 : Math.floor((e.clientY - (rect.top+0.01)) / PIXEL_SIZE);
+	return {x:x, y:y};
+}
+
 (function($) {
   $.fn.addAutoLink = function() {
   	$(this).html( $(this).html().replace(/((http|https):\/\/[\w?=&.\/-;#~%-]+(?![\w\s?&.\/;#~%"=-]*>))/g, '<a href="$1" target="_blank">$1</a>') );
@@ -93,9 +100,9 @@ function initApp() {
 
 	// canvas onclick
 	canvas.on('click', function(e) {
-		var rect = e.target.getBoundingClientRect();
-		var x = e.clientX - rect.left <= 0 ? 0 : Math.floor((e.clientX - rect.left) / PIXEL_SIZE);
-		var y = e.clientY - rect.top <= 0 ? 0 : Math.floor((e.clientY - rect.top) / PIXEL_SIZE);
+		var p = getMousePosition(e);
+		var x = p.x;
+		var y = p.y;
 		console.log("x:", x, "y:", y);
 		var pixelNumber = getPixelNumber(x, y);
 		e.preventDefault();
@@ -157,12 +164,10 @@ function initApp() {
 	});
 
 	canvas.on('mousemove', function(e) {
-		var rect = e.target.getBoundingClientRect();
-		var x = e.clientX - rect.left <= 0 ? 0 : Math.floor((e.clientX - rect.left) / PIXEL_SIZE);
-		var y = e.clientY - rect.top <= 0 ? 0 : Math.floor((e.clientY - (rect.top+0.01)) / PIXEL_SIZE);
-		console.log("x:", x, "y:", y);
-		$('#info_pixel_x').text(x);
-		$('#info_pixel_y').text(y);
+		var p = getMousePosition(e);
+		console.log("x:", p.x, "y:", p.y);
+		$('#info_pixel_x').text(p.x);
+		$('#info_pixel_y').text(p.y);
 	});
 
 	// info_panel
