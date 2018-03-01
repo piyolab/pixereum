@@ -120,6 +120,7 @@ function initApp() {
 				pixelData.message = result[1];
 				pixelData.ethPrice = result[2]["c"][0]/10000;
 				pixelData.isSale = result[3];
+				$('#modal_pixel_detail_hex_x').text(pixelData.hexX);
 				$('#modal_pixel_detail_hex_y').text(pixelData.hexY);
 				$('#modal_pixel_detail_pixel_number').text(pixereum.pixels[x][y].pixelNumber)
 				$('#modal_pixel_detail_color_hex').text(pixereum.pixels[x][y].color);
