@@ -143,21 +143,26 @@ function getPixels(callback) {
 }
 
 
-function initApp() {
-	initSettings();
-	initWeb3();
-	initContract();
+function registerModalPixelBuy(pixelData) {
+	$('#modal_pixel_detail_buy').click(function(e) {
+		console.log("buy");
+		data = "0x" + pixelData.hexX + pixelData.hexY + "FFFFFF";
+		console.log("CONTRACT_ADDRESS: " + pixereum.contract.address);
+		console.log("data: " + data);
+		window.web3.eth.sendTransaction({to: pixereum.contract.address, data: data, value: web3.toWei(pixelData.ethPrice, "ether"), gasLimit: 200000}, function(error, transactionHash) {
+			if (!error) {
+				console.log(transactionHash);
+			}
+		});
+	});	
+}
 
-	getPixels(()=>{
-		addGrid(canvas, context);
-	});
-
-	// canvas onclick
+function registerCanvasClick() {
 	canvas.on('click', function(e) {
 		var p = getMousePosition(e);
 		var x = p.x;
 		var y = p.y;
-		// console.log("x:", x, "y:", y);
+		console.log("x:", x, "y:", y);
 		var pixelNumber = getPixelNumber(x, y);
 		console.log(pixelNumber);
 		e.preventDefault();
@@ -192,20 +197,7 @@ function initApp() {
 				$('#modal_pixel_detail_message').addAutoLink();
 				if (pixelData.isSale) {
 					$('#modal_pixel_detail_sale').text("for sale");
-
-					if(pixereum.isMetaMask) {
-						$('#modal_pixel_buy').click(function(e) {
-							console.log("buy");
-							data = "0x" + pixelData.hexX + pixelData.hexY + "FFFFFF";
-							console.log("CONTRACT_ADDRESS: " + pixereum.contract.address);
-							console.log("data: " + data);
-							window.web3.eth.sendTransaction({to: pixereum.contract.address, data: data, value: web3.toWei(pixelData.ethPrice, "ether"), gasLimit: 200000}, function(error, transactionHash) {
-		  						if (!error) {
-		  							console.log(transactionHash);
-		  						}
-							});
-						});	
-					}
+					if(pixereum.isMetaMask) registerModalPixelBuy(pixelData);
 				} else {
 					$('#modal_pixel_detail_sale').text("not for sale");
 					$('#modal_pixel_buy').hide();
@@ -217,12 +209,28 @@ function initApp() {
 	    	}
 		});
 	});
+}
 
+
+function registerMouseMove() {
 	canvas.on('mousemove', function(e) {
 		var p = getMousePosition(e);
 		// console.log("x:", p.x, "y:", p.y);
 		$('#info_pixel_x').text(p.x);
 		$('#info_pixel_y').text(p.y);
+	});
+}
+
+
+function initApp() {
+	initSettings();
+	initWeb3();
+	initContract();
+
+	getPixels(()=>{
+		addGrid(canvas, context);
+		registerCanvasClick();
+		registerMouseMove();
 	});
 
 	// info_panel
