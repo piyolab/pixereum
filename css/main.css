@@ -36,7 +36,7 @@ a:hover {
 	z-index: 100;
 	background-color: #FFFFFF;
 	width: 1200px;
-	height: 80px;
+	height: 60px;
 	display: table;
 }
 
@@ -63,7 +63,7 @@ a:hover {
 
 #main_box {
 	margin: 0px;
-	margin-top: 80px;
+	margin-top: 60px;
 	padding: 0px;
 }
 

@@ -1,15 +1,22 @@
+var isMainnet = true;
+
 var pixereum = {};								// store global variables
 
 var SIZE = 100;									// number of columns (rows)
 var PIXEL_SIZE = 12;							// pixel width (height)
-var CONTRACT_ADDRESS = 
-"0x2cbddcdb4f41e6b3aba2bc214279d3238b6d3801"
-;
+
+var CONTRACT_ADDRESS = [
+"0xBFC28Cd8b0F3AdBF0686DBF97dE4212eFf5A42b9",	// Ropsten
+"0xc0d72D45CcA854e0F2fE3Cd2D4BAb91E772fE4C0"	// Mainnet
+];
+
 var CONTRACT_ABI = 
-[{"constant":false,"inputs":[{"name":"_x","type":"bytes1"},{"name":"_y","type":"bytes1"},{"name":"_message","type":"string"}],"name":"setMessage","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"numberOfPixels","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_x","type":"bytes1"},{"name":"_y","type":"bytes1"},{"name":"_weiAmount","type":"uint256"}],"name":"setPrice","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"getColors","outputs":[{"name":"","type":"uint24[10000]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"feeRate","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_x","type":"bytes1"},{"name":"_y","type":"bytes1"},{"name":"_red","type":"bytes1"},{"name":"_green","type":"bytes1"},{"name":"_blue","type":"bytes1"}],"name":"setColor","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"colors","outputs":[{"name":"","type":"uint24"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_x","type":"bytes1"},{"name":"_y","type":"bytes1"},{"name":"_isSale","type":"bool"}],"name":"setSaleState","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_at","type":"uint16"}],"name":"getPixel","outputs":[{"name":"","type":"address"},{"name":"","type":"string"},{"name":"","type":"uint256"},{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"payable":true,"stateMutability":"payable","type":"fallback"}]
+[{"constant":true,"inputs":[],"name":"feeRate","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"width","outputs":[{"name":"","type":"uint16"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"colors","outputs":[{"name":"","type":"uint24"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getColors","outputs":[{"name":"","type":"uint24[10000]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_pixelNumber","type":"uint16"}],"name":"getPixel","outputs":[{"name":"","type":"address"},{"name":"","type":"string"},{"name":"","type":"uint256"},{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"isMessageEnabled","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"numberOfPixels","outputs":[{"name":"","type":"uint16"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_color","type":"uint24"}],"name":"setColor","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"beneficiary","type":"address"},{"name":"_pixelNumber","type":"uint16"},{"name":"_color","type":"uint24"},{"name":"_message","type":"string"}],"name":"buyPixel","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_isSale","type":"bool"}],"name":"setSaleState","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"}],"name":"deleteMessage","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_weiAmount","type":"uint256"}],"name":"setPrice","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_owner","type":"address"}],"name":"setOwner","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_isMesssageEnabled","type":"bool"}],"name":"setMessageStatus","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_message","type":"string"}],"name":"setMessage","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"payable":true,"stateMutability":"payable","type":"fallback"}]
 ;
+
 var DEFAULT_WEB3_HTTP_PROVIDERS = [
-"https://mainnet.infura.io"
+"https://ropsten.infura.io",		// Ropsten
+"https://mainnet.infura.io"			// Mainnet
 ];
 
 // Initialize variables
@@ -37,6 +44,16 @@ function getPixelNumber(x, y) {
 	return x + y * SIZE;
 }
 
+function getIntColor(colorCode) {
+	colorCode = colorCode.slice(1);
+	r = parseInt(colorCode.substr(0,2), 16);
+	g = parseInt(colorCode.substr(2,2), 16);
+	b = parseInt(colorCode.substr(4,2), 16);
+	colorInt = r*256*256 + g*256 + b;
+	console.log(colorInt);
+	return colorInt;
+}
+
 function getHexColorString(val) {
     return (('000000' + val.toString(16).toUpperCase()).substr(-6));
 }
@@ -60,17 +77,53 @@ function addGrid(canvas, context){
 	context.stroke();
 }
 
+function getMousePosition(e) {
+	var rect = e.target.getBoundingClientRect();
+	var x = e.clientX - rect.left <= 0 ? 0 : Math.floor((e.clientX - rect.left) / PIXEL_SIZE);
+	var y = e.clientY - rect.top <= 0 ? 0 : Math.floor((e.clientY - (rect.top+0.01)) / PIXEL_SIZE);
+	return {x:x, y:y};
+}
+
 (function($) {
   $.fn.addAutoLink = function() {
   	$(this).html( $(this).html().replace(/((http|https):\/\/[\w?=&.\/-;#~%-]+(?![\w\s?&.\/;#~%"=-]*>))/g, '<a href="$1" target="_blank">$1</a>') );
   };
 })(jQuery);
 
-function initApp() {
-	// get pixel colors from smart contract
-	// and render pixels
-	// var res = pixereum.contract.getColors.call();
 
+function initSettings() {
+	if (isMainnet) {
+		// settings for Mainnet
+		pixereum.httpProvider = DEFAULT_WEB3_HTTP_PROVIDERS[1];
+		pixereum.address = CONTRACT_ADDRESS[1];
+	} else {
+		// settings for Ropsten
+		pixereum.httpProvider = DEFAULT_WEB3_HTTP_PROVIDERS[0];
+		pixereum.address = CONTRACT_ADDRESS[0];
+	}
+}
+
+
+function initWeb3(){
+  if (typeof web3 !== 'undefined') {
+    console.log('Using MetaMask!')
+    window.web3 = new Web3(web3.currentProvider);
+    pixereum.isMetaMask = true;
+  } else {
+    console.log('Using HTTP provider!')
+    window.web3 = new Web3(new Web3.providers.HttpProvider(pixereum.httpProvider));
+  }
+}
+
+
+function initContract() {
+	var address = CONTRACT_ADDRESS[1];
+	if (!isMainnet) address = CONTRACT_ADDRESS[0];
+	pixereum.contract = window.web3.eth.contract(CONTRACT_ABI).at(pixereum.address);
+}
+
+
+function getPixels(callback) {
 	pixereum.contract.getColors(function(error, result){
 		if(!error) {
         	console.log(result);
@@ -82,33 +135,87 @@ function initApp() {
 					fillPixel(context, xIndex, yIndex, hexColorString);
 					pixereum.pixels[xIndex][yIndex]= {pixelNumber: pixelNumber, intColor: intColor, color: hexColorString};
 				});
-			});
-			addGrid(canvas, context);
+			});		
+			callback();
     	} else {
         	console.error(error);
     	}
 	});
+}
 
-	// add grid
+function registerModals() {
+    $('#modal_pixel_detail').iziModal({
+		title: 'pixel details',
+		group: "detail",
+		padding: 20,
+		width: 600,
+		closeButton: true	
+	});
 
-	// canvas onclick
+	$('#modal_pixel_buy_detail').iziModal({
+		title: 'buy pixel',
+		group: "detail",
+		padding: 20,
+		width: 600,
+		fullscreen: true,
+		closeButton: true	
+	});
+}
+
+function registerPixelBuyButton() {
+
+	$('#modal_pixel_detail_buy').click(function(e) {
+		$('#modal_pixel_detail').iziModal('next');
+	});
+
+	$('#pixel_buy_button').click(function(e) {
+		console.log("buy!");
+		var x = $('#pixel_x').val();
+		var y = $('#pixel_y').val();
+		var pixelNumber = getPixelNumber(parseInt(x, 10), parseInt(y, 10));
+		var owner = $('#pixel_buy_owner').val();
+		var color = $('#pixel_buy_color').val();
+		var intColor = getIntColor(color);
+		var message = $('#pixel_buy_message').val();
+		var price = $('#pixel_price').val();
+		var weiValue = web3.toWei(price, "ether");
+		console.log(owner);
+		console.log("pixelNumber", pixelNumber);
+		console.log("color", color);
+		console.log("intColor", intColor);
+		console.log(message);
+		console.log(price);
+
+		pixereum.contract.buyPixel(owner, pixelNumber, intColor, message,
+								   {value:weiValue},
+		function(error, result) {
+			console.log(result);
+		});
+
+
+	});	
+}
+
+function registerCanvasClick() {
 	canvas.on('click', function(e) {
-		var rect = e.target.getBoundingClientRect();
-		var x = e.clientX - rect.left <= 0 ? 0 : Math.floor((e.clientX - rect.left) / PIXEL_SIZE);
-		var y = e.clientY - rect.top <= 0 ? 0 : Math.floor((e.clientY - rect.top) / PIXEL_SIZE);
+		var p = getMousePosition(e);
+		var x = p.x;
+		var y = p.y;
 		console.log("x:", x, "y:", y);
 		var pixelNumber = getPixelNumber(x, y);
+		console.log(pixelNumber);
 		e.preventDefault();
-	    $('#modal_pixel_detail').iziModal({
-			title: 'pixel details',
-			padding: 20,
-			width: 600,
-			closeButton: true	
-		});
+
 	    $('#modal_pixel_detail').iziModal('open');
 	    $('#modal_pixel_detail').iziModal('startLoading');
-		$('#modal_pixel_detail_x').text(x);
-		$('#modal_pixel_detail_y').text(y);
+		$('.pixel_x').text(x);
+		$('.pixel_y').text(y);
+		$('#pixel_x').val(x);
+		$('#pixel_y').val(y);
+
+		if (pixereum.isMetaMask) {
+			$('#pixel_buy_owner').val(window.web3.eth.accounts[0]);			
+		}
 
 		var pixelData = {};
 		pixereum.contract.getPixel(getPixelNumber(x, y), function(error, result){
@@ -129,40 +236,42 @@ function initApp() {
 				$('#modal_pixel_detail_message').text(pixelData.message);
 				$('#modal_pixel_detail_message').addAutoLink();
 				if (pixelData.isSale) {
-					$('#modal_pixel_detail_sale').text("for sale");
-
-					if(pixereum.isMetaMask) {
-						$('#modal_pixel_buy').click(function(e) {
-							console.log("buy");
-							data = "0x" + pixelData.hexX + pixelData.hexY + "FFFFFF";
-							console.log("CONTRACT_ADDRESS: " + CONTRACT_ADDRESS);
-							console.log("data: " + data);
-							web3.eth.sendTransaction({to: CONTRACT_ADDRESS, data: data, value: web3.toWei(pixelData.ethPrice, "ether"), gasLimit: 200000}, function(error, transactionHash) {
-		  						if (!error) {
-		  							console.log(transactionHash);
-		  						}
-							});
-						});	
-					}
+					$('.pixel_sale').text("for sale");
 				} else {
-					$('#modal_pixel_detail_sale').text("not for sale");
-					$('#modal_pixel_buy').hide();
+					$('.pixel_sale').text("not for sale");
 				}
-				$('#modal_pixel_detail_price').text(pixelData.ethPrice);
+				$('.pixel_price').text(pixelData.ethPrice);
+				$('#pixel_price').val(pixelData.ethPrice);
 			    $('#modal_pixel_detail').iziModal('stopLoading');
 	    	} else {
 	        	console.error(error);
 	    	}
 		});
 	});
+}
 
+
+function registerMouseMove() {
 	canvas.on('mousemove', function(e) {
-		var rect = e.target.getBoundingClientRect();
-		var x = e.clientX - rect.left <= 0 ? 0 : Math.floor((e.clientX - rect.left) / PIXEL_SIZE);
-		var y = e.clientY - rect.top <= 0 ? 0 : Math.floor((e.clientY - rect.top) / PIXEL_SIZE);
-		console.log("x:", x, "y:", y);
-		$('#info_pixel_x').text(x);
-		$('#info_pixel_y').text(y);
+		var p = getMousePosition(e);
+		// console.log("x:", p.x, "y:", p.y);
+		$('#info_pixel_x').text(p.x);
+		$('#info_pixel_y').text(p.y);
+	});
+}
+
+
+function initApp() {
+	initSettings();
+	initWeb3();
+	initContract();
+
+	getPixels(()=>{
+		addGrid(canvas, context);
+		registerModals();
+		registerCanvasClick();
+		registerMouseMove();
+		registerPixelBuyButton();
 	});
 
 	// info_panel
@@ -184,20 +293,5 @@ function initApp() {
 }
 
 window.addEventListener('load', function() {
-  // Checking if Web3 has been injected by the browser (Mist/MetaMask)
-  if (typeof web3 !== 'undefined') {
-    // Use Mist/MetaMask's provider
-    console.log('Using MetaMask!')
-    window.web3 = new Web3(web3.currentProvider);
-    pixereum.isMetaMask = true;
-  } else {
-    console.log('No web3? You should consider trying MetaMask!')
-    // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-    // window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-    window.web3 = new Web3(new Web3.providers.HttpProvider(DEFAULT_WEB3_HTTP_PROVIDERS[0]));
-  }
-
-  // Now you can start your app & access web3 freely:
-  pixereum.contract = window.web3.eth.contract(CONTRACT_ABI).at(CONTRACT_ADDRESS);
-  initApp();
-})
+	initApp();
+});
