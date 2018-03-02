@@ -98,3 +98,9 @@ a:hover {
 #pixel_detail_sale_status {
 	color: #FF0000;
 }
+
+.notice {
+	color: #ff7e79;
+	font-style: italic;
+	font-size: 80%;
+}

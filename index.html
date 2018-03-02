@@ -96,21 +96,61 @@
 		</table>
 		<div id="get_pixel">
 			<br />
-			<div class="modal_section">get pixel</div>
-			<p>Owner address: <input type="text" id="pixel_buy_owner" size="80"></p>
-			<p><i>Put a new owner's wallet address.</i></p>
+			<div class="modal_section metamask">get pixel</div>
+			<p class="metamask">
+				Owner address: <input type="text" id="pixel_buy_owner" size="80">
+			</p>
+			<div class="notice metamask">
+				Put a new owner's wallet address.
+			</div>
 			<br />
 			<p>Color: <input type="text" id="pixel_buy_color" placeholder="#000000"><input type="color" id="pixel_color_picker" placeholder="cannot use color picker on your browser. please use left field to put hex color code." size="80"></p>
 			<br />
-			<p>Message: <input type="text" id="pixel_buy_message"></p>
-			<p><i>Be carefull. Your message will remain permanently on the blockchain.</i></p>
+			<p class="metamask">
+				Message: <input type="text" id="pixel_buy_message">
+			</p>
+			<div class="notice metamask">
+				Be carefull. Your message will remain permanently on the blockchain.
+			</div>
 			<br />
-			<p><button id="pixel_buy_button_metamask">get this pixel with MetaMask</button></p>
+			<p class="metamask"><button id="pixel_buy_button_metamask">get this pixel with MetaMask</button></p>
 			<p><button id="pixel_buy_button_direct">get this pixel by sending Ether directly</button></p>
 			<input type="hidden" id="pixel_x">
 			<input type="hidden" id="pixel_y">
+			<input type="hidden" id="pixel_sale_status">
 			<input type="hidden" id="pixel_price">
 		</div>
+
+		<div id="get_pixel_direct">
+			<br />
+			<div class="modal_section">
+				Get this pixel by sending Ether directly
+			</div>
+			<p>
+				Get this pixel by sending the amount of Ether to the address below.
+			</p>
+			<div class="notice">
+				Note: cannot put a message to this pixel with this method.
+			</div>
+			<br />
+			<table class="pixel_info_table">
+				<tr>
+					<td>contract address</td>
+					<td><input id="pixel_direct_address" size="60" readonly></td>
+				</tr>
+				<tr>
+					<td>price (ETH amount)</td>
+					<td><input id="pixel_direct_price" size="60" readonly></td>
+				</tr>
+				<tr>
+					<td>data</td>
+					<td><input id="pixel_direct_data" size="60" readonly></td>
+				</tr>
+
+			</table>
+		</div>
+
+
 	</div>
 
 	<script type="text/javascript" src="./js/main.js"></script>

@@ -50,8 +50,12 @@ function getIntColor(colorCode) {
 	g = parseInt(colorCode.substr(2,2), 16);
 	b = parseInt(colorCode.substr(4,2), 16);
 	colorInt = r*256*256 + g*256 + b;
-	console.log(colorInt);
+	// console.log(colorInt);
 	return colorInt;
+}
+
+function getHexCoordString(coord) {
+	return ('00' + coord.toString(16).toUpperCase()).substr(-2);
 }
 
 function getHexColorString(val) {
@@ -155,41 +159,102 @@ function registerModals() {
 }
 
 
+function getPixelBuyInputs() {
+	return {
+		x: parseInt($('#pixel_x').val()),
+		y: parseInt($('#pixel_y').val()),
+		owner: $('#pixel_buy_owner').val(),
+		color: $('#pixel_buy_color').val(),
+		message: $('#pixel_buy_message').val(),
+		price: $('#pixel_price').val(),
+	}
+}
+
+
+function checkSaleStatus() {
+	var isSale = $('#pixel_sale_status').val();
+	if(isSale != "true") {
+		return false;
+	} else {
+		return true;
+	}
+}
+
+
 function registerPixelBuyButton() {
 
 	$('#pixel_buy_button_metamask').click(function(e) {
 		console.log("buy width MetaMask!");
-		var x = $('#pixel_x').val();
-		var y = $('#pixel_y').val();
-		var pixelNumber = getPixelNumber(parseInt(x, 10), parseInt(y, 10));
-		var owner = $('#pixel_buy_owner').val();
-		var color = $('#pixel_buy_color').val();
-		var intColor = getIntColor(color);
-		var message = $('#pixel_buy_message').val();
-		var price = $('#pixel_price').val();
-		var weiValue = web3.toWei(price, "ether");
 
-		console.log("owner", owner);
-		console.log("pixelNumber", pixelNumber);
-		console.log("color", color);
-		console.log("intColor", intColor);
-		console.log("message", message);
-		console.log("price", price);
+		if (!checkSaleStatus()) {
+			alert("This pixel is currently not for sale.");
+			return;
+		}
 
-		pixereum.contract.buyPixel(owner, pixelNumber, intColor, message,
+		var inputs = getPixelBuyInputs();
+		console.log(inputs);
+		var intColor = getIntColor(inputs.color);
+		var pixelNumber = getPixelNumber(inputs.x, inputs.y);
+		var weiValue = web3.toWei(inputs.price, "ether");
+
+		pixereum.contract.buyPixel(inputs.owner,
+									pixelNumber,
+									intColor,
+									inputs.message,
 								   {value:weiValue},
-		function(error, result) {
+								   function(error, result) {
 			console.log(result);
+			// TODO result 画面を出す
 		});
 
 	});	
 }
 
 
+function registerDirectPixelBuyButton() {
+	$('#pixel_buy_button_direct').click(function(e) {
+		console.log("buy directly!");
+
+		if (!checkSaleStatus()) {
+			alert("This pixel is currently not for sale.");
+			return;
+		}
+
+		var inputs = getPixelBuyInputs();
+		console.log(inputs);
+		var hexX = getHexCoordString(inputs.x);
+		var hexY = getHexCoordString(inputs.y);
+		var colorCode = inputs.color.slice(1);
+
+		var data = "0x" + hexX + hexY + colorCode;
+
+		$('#pixel_direct_address').val(pixereum.address);		
+		$('#pixel_direct_price').val(inputs.price);
+		$('#pixel_direct_data').val(data);
+
+		$('#get_pixel_direct').show();
+
+	});
+}
+
+
 function resetField() {
 	$('#pixel_buy_message').val("");
-	$('#pixel_color_picker').val("");
-	$('#pixel_buy_color').val("");
+	$('#pixel_color_picker').val("#00FFFF");
+	$('#pixel_buy_color').val("#00FFFF");
+}
+
+
+function hideSections() {
+	$('#get_pixel_direct').hide();
+}
+
+function hideDetails() {
+	if(pixereum.isMetaMask != true) {
+		$(".metamask").map(function(){
+    		return $(this).hide();
+		});
+	}
 }
 
 
@@ -198,8 +263,8 @@ function getPixelData(x, y, callback) {
 		if(!error) {
         	console.log(result);
         	var pixelData = {};
-			pixelData.hexX = ('00' + x.toString(16).toUpperCase()).substr(-2); 
-			pixelData.hexY = ('00' + y.toString(16).toUpperCase()).substr(-2);
+			pixelData.hexX = getHexCoordString(x); 
+			pixelData.hexY = getHexCoordString(y);
 			pixelData.owner = result[0];
 			pixelData.message = result[1];
 			pixelData.ethPrice = result[2]["c"][0]/10000;
@@ -216,6 +281,7 @@ function registerCanvasClick() {
 	canvas.on('click', function(e) {
 
 		resetField();
+		hideSections();
 
 		var p = getMousePosition(e);
 		var x = p.x;
@@ -245,6 +311,7 @@ function registerCanvasClick() {
 			$('#pixel_detail_owner').text(pixelData.owner);
 			$('#pixel_detail_message').text(pixelData.message);
 			$('#pixel_detail_message').addAutoLink();
+			$('#pixel_sale_status').val(pixelData.isSale);
 			if (pixelData.isSale) {
 				$('#pixel_detail_sale_status').text("for sale");
 			} else {
@@ -274,6 +341,10 @@ function registerColorPicker() {
 		var colorHex = $('#pixel_color_picker').val();
 		$('#pixel_buy_color').val(colorHex);
 	});
+	$('#pixel_buy_color').on("change", function(){
+		var colorHex = $('#pixel_buy_color').val();
+		$('#pixel_color_picker').val(colorHex);
+	});
 }
 
 
@@ -288,7 +359,9 @@ function initApp() {
 		registerCanvasClick();
 		registerMouseMove();
 		registerPixelBuyButton();
+		registerDirectPixelBuyButton();
 		registerColorPicker();
+		hideDetails();
 	});
 
 	// info_panel
