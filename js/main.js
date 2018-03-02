@@ -149,14 +149,6 @@ function registerModals() {
 		group: "detail",
 		padding: 20,
 		width: 600,
-		closeButton: true	
-	});
-
-	$('#modal_pixel_buy_detail').iziModal({
-		title: 'buy pixel',
-		group: "detail",
-		padding: 20,
-		width: 600,
 		fullscreen: true,
 		closeButton: true	
 	});

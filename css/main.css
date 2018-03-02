@@ -80,3 +80,12 @@ a:hover {
 	font-style: italic;
 	color: #909090: 
 }
+
+.modal_section {
+	text-align: center;
+	font-size: 120%;
+ 	font-family: "HelveticaNeue-Thin", "Helvetica Neue Thin", "Helvetica Neue";
+ 	font-weight: 100;
+ 	margin-right: 60px;
+ 	margin-bottom: 10px;
+}
