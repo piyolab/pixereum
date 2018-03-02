@@ -185,6 +185,7 @@ function registerPixelBuyButton() {
 
 	$('#pixel_buy_button_metamask').click(function(e) {
 		console.log("buy width MetaMask!");
+		$('#transaction_result').hide();
 
 		if (!checkSaleStatus()) {
 			alert("This pixel is currently not for sale.");
@@ -204,7 +205,19 @@ function registerPixelBuyButton() {
 								   {value:weiValue},
 								   function(error, result) {
 			console.log(result);
-			// TODO result 画面を出す
+			if (result) {
+				$('#tx_result').empty();
+				var baseUrl = "https://etherscan.io/tx/";
+				if (!isMainnet) baseUrl = "https://ropsten.etherscan.io/tx/";
+				var url = baseUrl + result;
+				$('#tx_result').append($( "<a>", {
+					href: url,
+					text: "etherscan: " + result,
+					target: "_blank"
+				}));
+
+				$('#transaction_result').show();
+			}
 		});
 
 	});	
@@ -247,6 +260,7 @@ function resetField() {
 
 function hideSections() {
 	$('#get_pixel_direct').hide();
+	$('#transaction_result').hide();
 }
 
 function hideDetails() {

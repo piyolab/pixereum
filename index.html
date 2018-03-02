@@ -113,8 +113,17 @@
 				Be carefull. Your message will remain permanently on the blockchain.
 			</div>
 			<br />
-			<p class="metamask"><button id="pixel_buy_button_metamask">get this pixel with MetaMask</button></p>
-			<p><button id="pixel_buy_button_direct">get this pixel by sending Ether directly</button></p>
+			<p class="metamask">
+				<button id="pixel_buy_button_metamask">
+					get this pixel with MetaMask
+				</button>
+			</p>
+			</br />
+			<p>
+				<button id="pixel_buy_button_direct">
+					get this pixel by sending Ether directly
+				</button>
+			</p>
 			<input type="hidden" id="pixel_x">
 			<input type="hidden" id="pixel_y">
 			<input type="hidden" id="pixel_sale_status">
@@ -146,10 +155,16 @@
 					<td>data</td>
 					<td><input id="pixel_direct_data" size="60" readonly></td>
 				</tr>
-
 			</table>
 		</div>
 
+		<div id="transaction_result">
+			<br />
+			<div class="modal_section">
+				Transaction Result
+			</div>
+			<div id="tx_result"></div>
+		</div>
 
 	</div>
 
