@@ -17,8 +17,8 @@
 		<div id="menu_box">
 			<h1 id="title">Pixereum</h1>
 			<div id="info_panel">
-				<p>number of pixels: <label id="info_pixel_num"></label></p>
-				<p>x: <label id="info_pixel_x"></label> y: <label id="info_pixel_y"></label></p>
+				<p>number of pixels: <span id="info_pixel_num"></span></p>
+				<p>x: <span id="info_pixel_x"></span> y: <span id="info_pixel_y"></span></p>
 			</div>
 			<div id="links">
 				<p><a href="#about" class="about_trigger">about this project</a> | <a href="https://goo.gl/4u2AAW" target="_blank">how to get your pixel</a> | <a href="https://github.com/piyolab/pixereum" target="_blank">github</a></p>
@@ -47,19 +47,38 @@
 	</div>
 
 	<div id="modal_pixel_detail" class="modal">
-		<h1><label id="modal_pixel_detail_message"></label></h1>
-		<p>owner: <label id="modal_pixel_detail_owner" class="modal_pixel_detail_value"></label></p>
-		
-		<p>x: <label id="modal_pixel_detail_x" class="modal_pixel_detail_value"></label></p>
-		<p>y: <label id="modal_pixel_detail_y" class="modal_pixel_detail_value"></label></p>
-		<p>x (hex): <label id="modal_pixel_detail_hex_x" class="modal_pixel_detail_value"></label></p>
-		<p>y (hex): <label id="modal_pixel_detail_hex_y" class="modal_pixel_detail_value"></label></p>		
-		<p>pixel number: <label id="modal_pixel_detail_pixel_number" class="modal_pixel_detail_value"></label> </p>
-		<p>color code (hex): <label id="modal_pixel_detail_color_hex" class="modal_pixel_detail_value"></label></p>
-		<p>color code (int): <label id="modal_pixel_detail_color_int" class="modal_pixel_detail_value"></label></p>
-		<p>sale?: <label id="modal_pixel_detail_sale" class="modal_pixel_detail_value"></label></p>
-		<p>current price (ETH): <label id="modal_pixel_detail_price" class="modal_pixel_detail_value"></label></p>
-		<button id="modal_pixel_buy">Buy pixel</button>
+		<h1><span id="modal_pixel_detail_message"></span></h1>
+		<p>owner: <span id="modal_pixel_detail_owner" class="modal_pixel_detail_value"></span></p>
+
+		<p>x: <span class="pixel_x" class="modal_pixel_detail_value"></span></p>
+		<p>y: <span class="pixel_y" class="modal_pixel_detail_value"></span></p>
+		<p>x (hex): <span id="modal_pixel_detail_hex_x" class="modal_pixel_detail_value"></span></p>
+		<p>y (hex): <span id="modal_pixel_detail_hex_y" class="modal_pixel_detail_value"></span></p>		
+		<p>pixel number: <span id="modal_pixel_detail_pixel_number" class="modal_pixel_detail_value"></span> </p>
+		<p>color code (hex): <span id="modal_pixel_detail_color_hex" class="modal_pixel_detail_value"></span></p>
+		<p>color code (int): <span id="modal_pixel_detail_color_int" class="modal_pixel_detail_value"></span></p>
+		<p>sale?: <span class="pixel_sale" class="modal_pixel_detail_value"></span></p>
+		<p>current price (ETH): <span class="pixel_price" class="modal_pixel_detail_value"></span></p>
+		<button id="modal_pixel_detail_buy">Buy pixel</button>
+	</div>
+
+	<div id="modal_pixel_buy_detail" class="modal">
+		<h1>pixel(<span class="pixel_x"></span>,<span class="pixel_y"></span>)</h1>
+		<br />
+		<input type="hidden" id="pixel_x">
+		<input type="hidden" id="pixel_y">
+		<input type="hidden" id="pixel_price">
+		<p>price: <span class="pixel_price" class="modal_pixel_detail_value"></span> ETH</p>
+		<br />
+		<p>Owner address: <input type="text" id="pixel_buy_owner" size="80"></p>
+		<p><i>Change this address if you  give the pixel to someone.</i></p>
+		<br />
+		<p>Color: <input type="color" id="pixel_buy_color"></p>
+		<br />
+		<p>Message: <input type="text" id="pixel_buy_message"></p>
+		<p><i>Be carefull. Your message will remain permanently on the blockchain.</i></p>
+		<br />
+		<button id="pixel_buy_button">buy!</button>
 	</div>
 
 	<script type="text/javascript" src="./js/main.js"></script>

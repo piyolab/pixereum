@@ -44,13 +44,14 @@ function getPixelNumber(x, y) {
 	return x + y * SIZE;
 }
 
-function getColorInt(colorCode) {
-	colorCode = "81D4CB";
-	r = parseInt("81", 16);
-	g = parseInt("D4", 16);
-	b = parseInt("CB", 16);
+function getIntColor(colorCode) {
+	colorCode = colorCode.slice(1);
+	r = parseInt(colorCode.substr(0,2), 16);
+	g = parseInt(colorCode.substr(2,2), 16);
+	b = parseInt(colorCode.substr(4,2), 16);
 	colorInt = r*256*256 + g*256 + b;
 	console.log(colorInt);
+	return colorInt;
 }
 
 function getHexColorString(val) {
@@ -142,18 +143,56 @@ function getPixels(callback) {
 	});
 }
 
+function registerModals() {
+    $('#modal_pixel_detail').iziModal({
+		title: 'pixel details',
+		group: "detail",
+		padding: 20,
+		width: 600,
+		closeButton: true	
+	});
 
-function registerModalPixelBuy(pixelData) {
+	$('#modal_pixel_buy_detail').iziModal({
+		title: 'buy pixel',
+		group: "detail",
+		padding: 20,
+		width: 600,
+		fullscreen: true,
+		closeButton: true	
+	});
+}
+
+function registerPixelBuyButton() {
+
 	$('#modal_pixel_detail_buy').click(function(e) {
-		console.log("buy");
-		data = "0x" + pixelData.hexX + pixelData.hexY + "FFFFFF";
-		console.log("CONTRACT_ADDRESS: " + pixereum.contract.address);
-		console.log("data: " + data);
-		window.web3.eth.sendTransaction({to: pixereum.contract.address, data: data, value: web3.toWei(pixelData.ethPrice, "ether"), gasLimit: 200000}, function(error, transactionHash) {
-			if (!error) {
-				console.log(transactionHash);
-			}
+		$('#modal_pixel_detail').iziModal('next');
+	});
+
+	$('#pixel_buy_button').click(function(e) {
+		console.log("buy!");
+		var x = $('#pixel_x').val();
+		var y = $('#pixel_y').val();
+		var pixelNumber = getPixelNumber(parseInt(x, 10), parseInt(y, 10));
+		var owner = $('#pixel_buy_owner').val();
+		var color = $('#pixel_buy_color').val();
+		var intColor = getIntColor(color);
+		var message = $('#pixel_buy_message').val();
+		var price = $('#pixel_price').val();
+		var weiValue = web3.toWei(price, "ether");
+		console.log(owner);
+		console.log("pixelNumber", pixelNumber);
+		console.log("color", color);
+		console.log("intColor", intColor);
+		console.log(message);
+		console.log(price);
+
+		pixereum.contract.buyPixel(owner, pixelNumber, intColor, message,
+								   {value:weiValue},
+		function(error, result) {
+			console.log(result);
 		});
+
+
 	});	
 }
 
@@ -166,16 +205,17 @@ function registerCanvasClick() {
 		var pixelNumber = getPixelNumber(x, y);
 		console.log(pixelNumber);
 		e.preventDefault();
-	    $('#modal_pixel_detail').iziModal({
-			title: 'pixel details',
-			padding: 20,
-			width: 600,
-			closeButton: true	
-		});
+
 	    $('#modal_pixel_detail').iziModal('open');
 	    $('#modal_pixel_detail').iziModal('startLoading');
-		$('#modal_pixel_detail_x').text(x);
-		$('#modal_pixel_detail_y').text(y);
+		$('.pixel_x').text(x);
+		$('.pixel_y').text(y);
+		$('#pixel_x').val(x);
+		$('#pixel_y').val(y);
+
+		if (pixereum.isMetaMask) {
+			$('#pixel_buy_owner').val(window.web3.eth.accounts[0]);			
+		}
 
 		var pixelData = {};
 		pixereum.contract.getPixel(getPixelNumber(x, y), function(error, result){
@@ -196,13 +236,12 @@ function registerCanvasClick() {
 				$('#modal_pixel_detail_message').text(pixelData.message);
 				$('#modal_pixel_detail_message').addAutoLink();
 				if (pixelData.isSale) {
-					$('#modal_pixel_detail_sale').text("for sale");
-					if(pixereum.isMetaMask) registerModalPixelBuy(pixelData);
+					$('.pixel_sale').text("for sale");
 				} else {
-					$('#modal_pixel_detail_sale').text("not for sale");
-					$('#modal_pixel_buy').hide();
+					$('.pixel_sale').text("not for sale");
 				}
-				$('#modal_pixel_detail_price').text(pixelData.ethPrice);
+				$('.pixel_price').text(pixelData.ethPrice);
+				$('#pixel_price').val(pixelData.ethPrice);
 			    $('#modal_pixel_detail').iziModal('stopLoading');
 	    	} else {
 	        	console.error(error);
@@ -229,8 +268,10 @@ function initApp() {
 
 	getPixels(()=>{
 		addGrid(canvas, context);
+		registerModals();
 		registerCanvasClick();
 		registerMouseMove();
+		registerPixelBuyButton();
 	});
 
 	// info_panel
