@@ -264,7 +264,9 @@ function hideSections() {
 }
 
 function hideDetails() {
-	if(pixereum.isMetaMask != true) {
+	if(pixereum.isMetaMask == true) {
+		$('#pixel_buy_button_direct').hide();
+	} else {
 		$(".metamask").map(function(){
     		return $(this).hide();
 		});

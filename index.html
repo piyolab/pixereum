@@ -98,7 +98,7 @@
 			<br />
 			<div class="modal_section metamask">get pixel</div>
 			<p class="metamask">
-				Owner address: <input type="text" id="pixel_buy_owner" size="60">
+				Owner address: <input type="text" id="pixel_buy_owner" size="50">
 			</p>
 			<div class="notice metamask">
 				Put a new owner's wallet address.
@@ -140,9 +140,9 @@
 			<p>
 				Get this pixel by sending the amount of Ether to the address below.
 			</p>
-			<div class="notice">
+<!-- 			<div class="notice">
 				Note: cannot put a message to this pixel with this method.
-			</div>
+			</div> -->
 			<br />
 			<table class="pixel_info_table">
 				<tr>
@@ -173,28 +173,36 @@
 			<div class="modal_section">
 				Update pixel
 			</div>
-			<p>
-				Owner address: <input type="text" id="update_owner_input" size="60">
-				<button id="update_owner">update</button>
-			</p>
-			<p>
-				Color: <input type="text" id="update_color_input" placeholder="#000000"><input type="color" id="update_color_picker" placeholder="cannot use color picker on your browser. please use left field to put hex color code." size="80">
-				<button id="update_color">update</button>
-			</p>
-			<p>
-				Message: <input type="text" id="update_message_input">
-				<button id="update_message">update</button>
-			</p>
-			<p>
-				Price: <input type="number" id="update_price_input"> ETH
-				<button id="update_price">update</button>
-			</p>
-			<p>
-				Sale Sate:
-				<input type=radio name="isSale" value="true"> true 
-				<input type=radio name="isSale" value="false" checked> false
-				<button id="update_price">update</button>
-			</p>
+			<table>
+				<tr>
+					<td>Owner address</td>
+					<td><input type="text" id="update_owner_input" size="50"></td>
+					<td><button id="update_owner">update</button></td>
+				</tr>
+				<tr>
+					<td>Color</td>
+					<td><input type="text" id="update_color_input" placeholder="#000000"><input type="color" id="update_color_picker" placeholder="cannot use color picker" size="40"></td>
+					<td><button id="update_color">update</button></td>
+				</tr>
+				<tr>
+					<td>Message</td>
+					<td><input type="text" id="update_message_input"></td>
+					<td><button id="update_message">update</button></td>
+				</tr>
+				<tr>
+					<td>Price</td>
+					<td><input type="number" id="update_price_input"></td>
+					<td><button id="update_price">update</button></td>
+				</tr>
+				<tr>
+					<td>Sale Satatus</td>
+					<td>
+						<input type=radio name="isSale" value="true"> for sale 
+						<input type=radio name="isSale" value="false" checked> not for sale
+					</td>
+					<td><button id="update_sale">update</button></td>
+				</tr>
+			</table>
 		</div>
 	</div>
 
