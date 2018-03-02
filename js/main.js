@@ -1,4 +1,4 @@
-var isMainnet = false;
+var isMainnet = true;
 
 var pixereum = {};								// store global variables
 
