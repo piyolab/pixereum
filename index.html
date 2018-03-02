@@ -98,13 +98,15 @@
 			<br />
 			<div class="modal_section metamask">get pixel</div>
 			<p class="metamask">
-				Owner address: <input type="text" id="pixel_buy_owner" size="80">
+				Owner address: <input type="text" id="pixel_buy_owner" size="60">
 			</p>
 			<div class="notice metamask">
 				Put a new owner's wallet address.
 			</div>
 			<br />
-			<p>Color: <input type="text" id="pixel_buy_color" placeholder="#000000"><input type="color" id="pixel_color_picker" placeholder="cannot use color picker on your browser. please use left field to put hex color code." size="80"></p>
+			<p>
+				Color: <input type="text" id="pixel_buy_color" placeholder="#000000"><input type="color" id="pixel_color_picker" placeholder="cannot use color picker on your browser. please use left field to put hex color code." size="80">
+			</p>
 			<br />
 			<p class="metamask">
 				Message: <input type="text" id="pixel_buy_message">
@@ -166,6 +168,34 @@
 			<div id="tx_result"></div>
 		</div>
 
+		<div id="update_pixel">
+			<br />
+			<div class="modal_section">
+				Update pixel
+			</div>
+			<p>
+				Owner address: <input type="text" id="update_owner_input" size="60">
+				<button id="update_owner">update</button>
+			</p>
+			<p>
+				Color: <input type="text" id="update_color_input" placeholder="#000000"><input type="color" id="update_color_picker" placeholder="cannot use color picker on your browser. please use left field to put hex color code." size="80">
+				<button id="update_color">update</button>
+			</p>
+			<p>
+				Message: <input type="text" id="update_message_input">
+				<button id="update_message">update</button>
+			</p>
+			<p>
+				Price: <input type="number" id="update_price_input"> ETH
+				<button id="update_price">update</button>
+			</p>
+			<p>
+				Sale Sate:
+				<input type=radio name="isSale" value="true"> true 
+				<input type=radio name="isSale" value="false" checked> false
+				<button id="update_price">update</button>
+			</p>
+		</div>
 	</div>
 
 	<script type="text/javascript" src="./js/main.js"></script>
