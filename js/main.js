@@ -1,16 +1,22 @@
+var isMainnet = false;
+
 var pixereum = {};								// store global variables
 
 var SIZE = 100;									// number of columns (rows)
 var PIXEL_SIZE = 12;							// pixel width (height)
-var CONTRACT_ADDRESS = 
-// "0xBFC28Cd8b0F3AdBF0686DBF97dE4212eFf5A42b9"	// Ropsten
+
+var CONTRACT_ADDRESS = [
+"0xBFC28Cd8b0F3AdBF0686DBF97dE4212eFf5A42b9",	// Ropsten
 "0xc0d72D45CcA854e0F2fE3Cd2D4BAb91E772fE4C0"	// Mainnet
-;
+];
+
 var CONTRACT_ABI = 
 [{"constant":true,"inputs":[],"name":"feeRate","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"width","outputs":[{"name":"","type":"uint16"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"colors","outputs":[{"name":"","type":"uint24"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getColors","outputs":[{"name":"","type":"uint24[10000]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_pixelNumber","type":"uint16"}],"name":"getPixel","outputs":[{"name":"","type":"address"},{"name":"","type":"string"},{"name":"","type":"uint256"},{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"isMessageEnabled","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"numberOfPixels","outputs":[{"name":"","type":"uint16"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_color","type":"uint24"}],"name":"setColor","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"beneficiary","type":"address"},{"name":"_pixelNumber","type":"uint16"},{"name":"_color","type":"uint24"},{"name":"_message","type":"string"}],"name":"buyPixel","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_isSale","type":"bool"}],"name":"setSaleState","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"}],"name":"deleteMessage","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_weiAmount","type":"uint256"}],"name":"setPrice","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_owner","type":"address"}],"name":"setOwner","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_isMesssageEnabled","type":"bool"}],"name":"setMessageStatus","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_message","type":"string"}],"name":"setMessage","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"payable":true,"stateMutability":"payable","type":"fallback"}]
 ;
+
 var DEFAULT_WEB3_HTTP_PROVIDERS = [
-"https://ropsten.infura.io"
+"https://ropsten.infura.io",		// Ropsten
+"https://mainnet.infura.io"			// Mainnet
 ];
 
 // Initialize variables
@@ -83,10 +89,43 @@ function getMousePosition(e) {
   };
 })(jQuery);
 
+
+function initSettings() {
+	if (isMainnet) {
+		// settings for Mainnet
+		pixereum.httpProvider = DEFAULT_WEB3_HTTP_PROVIDERS[1];
+		pixereum.address = CONTRACT_ADDRESS[1];
+	} else {
+		// settings for Ropsten
+		pixereum.httpProvider = DEFAULT_WEB3_HTTP_PROVIDERS[0];
+		pixereum.address = CONTRACT_ADDRESS[0];
+	}
+}
+
+
+function initWeb3(){
+  if (typeof web3 !== 'undefined') {
+    console.log('Using MetaMask!')
+    window.web3 = new Web3(web3.currentProvider);
+    pixereum.isMetaMask = true;
+  } else {
+    console.log('Using HTTP provider!')
+    window.web3 = new Web3(new Web3.providers.HttpProvider(pixereum.httpProvider));
+  }
+}
+
+
+function initContract() {
+	var address = CONTRACT_ADDRESS[1];
+	if (!isMainnet) address = CONTRACT_ADDRESS[0];
+	pixereum.contract = window.web3.eth.contract(CONTRACT_ABI).at(pixereum.address);
+}
+
+
 function initApp() {
-	// get pixel colors from smart contract
-	// and render pixels
-	// var res = pixereum.contract.getColors.call();
+	initSettings();
+	initWeb3();
+	initContract();
 
 	pixereum.contract.getColors(function(error, result){
 		if(!error) {
@@ -153,9 +192,9 @@ function initApp() {
 						$('#modal_pixel_buy').click(function(e) {
 							console.log("buy");
 							data = "0x" + pixelData.hexX + pixelData.hexY + "FFFFFF";
-							console.log("CONTRACT_ADDRESS: " + CONTRACT_ADDRESS);
+							console.log("CONTRACT_ADDRESS: " + pixereum.contract.address);
 							console.log("data: " + data);
-							web3.eth.sendTransaction({to: CONTRACT_ADDRESS, data: data, value: web3.toWei(pixelData.ethPrice, "ether"), gasLimit: 200000}, function(error, transactionHash) {
+							window.web3.eth.sendTransaction({to: pixereum.contract.address, data: data, value: web3.toWei(pixelData.ethPrice, "ether"), gasLimit: 200000}, function(error, transactionHash) {
 		  						if (!error) {
 		  							console.log(transactionHash);
 		  						}
@@ -200,20 +239,5 @@ function initApp() {
 }
 
 window.addEventListener('load', function() {
-  // Checking if Web3 has been injected by the browser (Mist/MetaMask)
-  if (typeof web3 !== 'undefined') {
-    // Use Mist/MetaMask's provider
-    console.log('Using MetaMask!')
-    window.web3 = new Web3(web3.currentProvider);
-    pixereum.isMetaMask = true;
-  } else {
-    console.log('No web3? You should consider trying MetaMask!')
-    // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-    // window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-    window.web3 = new Web3(new Web3.providers.HttpProvider(DEFAULT_WEB3_HTTP_PROVIDERS[0]));
-  }
-
-  // Now you can start your app & access web3 freely:
-  pixereum.contract = window.web3.eth.contract(CONTRACT_ABI).at(CONTRACT_ADDRESS);
-  initApp();
-})
+	initApp();
+});
