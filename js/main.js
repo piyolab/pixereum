@@ -122,11 +122,7 @@ function initContract() {
 }
 
 
-function initApp() {
-	initSettings();
-	initWeb3();
-	initContract();
-
+function getPixels(callback) {
 	pixereum.contract.getColors(function(error, result){
 		if(!error) {
         	console.log(result);
@@ -138,14 +134,23 @@ function initApp() {
 					fillPixel(context, xIndex, yIndex, hexColorString);
 					pixereum.pixels[xIndex][yIndex]= {pixelNumber: pixelNumber, intColor: intColor, color: hexColorString};
 				});
-			});
-			addGrid(canvas, context);
+			});		
+			callback();
     	} else {
         	console.error(error);
     	}
 	});
+}
 
-	// add grid
+
+function initApp() {
+	initSettings();
+	initWeb3();
+	initContract();
+
+	getPixels(()=>{
+		addGrid(canvas, context);
+	});
 
 	// canvas onclick
 	canvas.on('click', function(e) {
