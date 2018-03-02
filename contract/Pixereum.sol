@@ -15,7 +15,7 @@ contract Pixereum {
     /**************************************************************************
     * public variables
     ***************************************************************************/
-    uint24[65536] public colors;
+    uint24[10000] public colors;
     bool public isMessageEnabled;
 
 
@@ -23,15 +23,15 @@ contract Pixereum {
     /**************************************************************************
     * private variables
     ***************************************************************************/
-    mapping (uint24 => Pixel) private pixels;
+    mapping (uint16 => Pixel) private pixels;
 
 
 
     /**************************************************************************
     * public constants
     ***************************************************************************/
-    uint24 public constant numberOfPixels = 65536;
-    uint16 public constant width = 256;
+    uint16 public constant numberOfPixels = 10000;
+    uint16 public constant width = 100;
     uint256 public constant feeRate = 100;
 
 
@@ -54,7 +54,7 @@ contract Pixereum {
         _;
     }
 
-    modifier onlyPixelOwner(uint24 pixelNumber) {
+    modifier onlyPixelOwner(uint16 pixelNumber) {
         require(msg.sender == pixels[pixelNumber].owner);
         _;
     }
@@ -81,7 +81,7 @@ contract Pixereum {
     * public methods
     ***************************************************************************/
 
-    function getPixel(uint24 _pixelNumber)
+    function getPixel(uint16 _pixelNumber)
         constant
         public
         returns(address, string, uint256, bool) 
@@ -96,7 +96,7 @@ contract Pixereum {
     }
     
     
-    function getColors() constant public returns(uint24[65536])  {
+    function getColors() constant public returns(uint24[10000])  {
         return colors;
     }
 
@@ -110,13 +110,13 @@ contract Pixereum {
         // bytes[0]=x, bytes[1]=y, bytes[2-4]=color
         require(msg.data.length == 5);
 
-        uint24 pixelNumber = getPixelNumber(msg.data[0], msg.data[1]);
+        uint16 pixelNumber = getPixelNumber(msg.data[0], msg.data[1]);
         uint24 color = getColor(msg.data[2], msg.data[3], msg.data[4]);
         buyPixel(msg.sender, pixelNumber, color, "");
     }
 
 
-    function buyPixel(address beneficiary, uint24 _pixelNumber, uint24 _color, string _message)
+    function buyPixel(address beneficiary, uint16 _pixelNumber, uint24 _color, string _message)
         payable
         public 
     {
@@ -153,7 +153,7 @@ contract Pixereum {
     }
 
 
-    function setOwner(uint24 _pixelNumber, address _owner) 
+    function setOwner(uint16 _pixelNumber, address _owner) 
         public
         onlyPixelOwner(_pixelNumber)
     {
@@ -162,7 +162,7 @@ contract Pixereum {
     }
 
 
-    function setColor(uint24 _pixelNumber, uint24 _color) 
+    function setColor(uint16 _pixelNumber, uint24 _color) 
         public
         onlyPixelOwner(_pixelNumber)
     {
@@ -170,7 +170,7 @@ contract Pixereum {
     }
 
 
-    function setMessage(uint24 _pixelNumber, string _message)
+    function setMessage(uint16 _pixelNumber, string _message)
         public
         messageEnabled
         onlyPixelOwner(_pixelNumber)
@@ -179,7 +179,7 @@ contract Pixereum {
     }
 
 
-    function setPrice(uint24 _pixelNumber, uint256 _weiAmount) 
+    function setPrice(uint16 _pixelNumber, uint256 _weiAmount) 
         public
         onlyPixelOwner(_pixelNumber)
     {
@@ -187,7 +187,7 @@ contract Pixereum {
     }
 
 
-    function setSaleState(uint24 _pixelNumber, bool _isSale)
+    function setSaleState(uint16 _pixelNumber, bool _isSale)
         public
         onlyPixelOwner(_pixelNumber)
     {
@@ -202,9 +202,9 @@ contract Pixereum {
 
     function getPixelNumber(byte _x, byte _y)
         internal pure
-        returns(uint24) 
+        returns(uint16) 
     {
-        return uint24(_x) + uint24(_y) * width;
+        return uint16(_x) + uint16(_y) * width;
     }
 
 
@@ -222,7 +222,7 @@ contract Pixereum {
     ***************************************************************************/
 
     // for emergency purpose
-    function deleteMessage(uint24 _pixelNumber)
+    function deleteMessage(uint16 _pixelNumber)
         onlyOwner
         public
     {
