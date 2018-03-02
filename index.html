@@ -48,38 +48,69 @@
 
 	<div id="modal_pixel_detail" class="modal">
 		<div class="modal_section">pixel info</div>
-		<h1><span id="modal_pixel_detail_message"></span></h1>
-		<p>owner: <span id="modal_pixel_detail_owner" class="modal_pixel_detail_value"></span></p>
-
-		<p>x: <span class="pixel_x" class="modal_pixel_detail_value"></span></p>
-		<p>y: <span class="pixel_y" class="modal_pixel_detail_value"></span></p>
-		<p>x (hex): <span id="modal_pixel_detail_hex_x" class="modal_pixel_detail_value"></span></p>
-		<p>y (hex): <span id="modal_pixel_detail_hex_y" class="modal_pixel_detail_value"></span></p>		
-		<p>pixel number: <span id="modal_pixel_detail_pixel_number" class="modal_pixel_detail_value"></span> </p>
-		<p>color code (hex): <span id="modal_pixel_detail_color_hex" class="modal_pixel_detail_value"></span></p>
-		<p>color code (int): <span id="modal_pixel_detail_color_int" class="modal_pixel_detail_value"></span></p>
-		<p>sale?: <span class="pixel_sale" class="modal_pixel_detail_value"></span></p>
-		<p>current price (ETH): <span class="pixel_price" class="modal_pixel_detail_value"></span></p>
-		<button id="modal_pixel_detail_buy">Buy pixel</button>
-	</div>
-
-	<div id="modal_pixel_buy_detail" class="modal">
-		<h1>pixel(<span class="pixel_x"></span>,<span class="pixel_y"></span>)</h1>
-		<br />
-		<input type="hidden" id="pixel_x">
-		<input type="hidden" id="pixel_y">
-		<input type="hidden" id="pixel_price">
-		<p>price: <span class="pixel_price" class="modal_pixel_detail_value"></span> ETH</p>
-		<br />
-		<p>Owner address: <input type="text" id="pixel_buy_owner" size="80"></p>
-		<p><i>Change this address if you  give the pixel to someone.</i></p>
-		<br />
-		<p>Color: <input type="color" id="pixel_buy_color"></p>
-		<br />
-		<p>Message: <input type="text" id="pixel_buy_message"></p>
-		<p><i>Be carefull. Your message will remain permanently on the blockchain.</i></p>
-		<br />
-		<button id="pixel_buy_button">buy!</button>
+		<table class="pixel_info_table">
+			<tr>
+				<td>message</td>
+				<td><span id="pixel_detail_message"></span></td>
+			</tr>
+			<tr>
+				<td>owner</td>
+				<td><span id="pixel_detail_owner"></span></td>
+			</tr>
+			<tr>
+				<td>x</td>
+				<td><span id="pixel_detail_x"></span></td>
+			</tr>
+			<tr>
+				<td>y</td>
+				<td><span id="pixel_detail_y"></span></td>
+			</tr>
+			<tr>
+				<td>x (hex)</td>
+				<td><span id="pixel_detail_x_hex"></span></td>
+			</tr>
+			<tr>
+				<td>y (hex)</td>
+				<td><span id="pixel_detail_y_hex"></span></td>
+			</tr>
+			<tr>
+				<td>pixel number</td>
+				<td><span id="pixel_detail_number"></span></td>
+			</tr>
+			<tr>
+				<td>color code (hex)</td>
+				<td><span id="pixel_detail_color_hex"></span></td>
+			</tr>
+			<tr>
+				<td>color code (int)</td>
+				<td><span id="pixel_detail_color_int"></span></td>
+			</tr>
+			<tr>
+				<td>sale status</td>
+				<td><span id="pixel_detail_sale_status"></span></td>
+			</tr>
+			<tr>
+				<td>current price (ETH)</td>
+				<td><span id="pixel_detail_price"></span></td>
+			</tr>	
+		</table>
+		<div id="get_pixel">
+			<br />
+			<div class="modal_section">get pixel</div>
+			<p>Owner address: <input type="text" id="pixel_buy_owner" size="80"></p>
+			<p><i>Put a new owner's wallet address.</i></p>
+			<br />
+			<p>Color: <input type="text" id="pixel_buy_color" placeholder="#000000"><input type="color" id="pixel_color_picker" placeholder="cannot use color picker on your browser. please use left field to put hex color code." size="80"></p>
+			<br />
+			<p>Message: <input type="text" id="pixel_buy_message"></p>
+			<p><i>Be carefull. Your message will remain permanently on the blockchain.</i></p>
+			<br />
+			<p><button id="pixel_buy_button_metamask">get this pixel with MetaMask</button></p>
+			<p><button id="pixel_buy_button_direct">get this pixel by sending Ether directly</button></p>
+			<input type="hidden" id="pixel_x">
+			<input type="hidden" id="pixel_y">
+			<input type="hidden" id="pixel_price">
+		</div>
 	</div>
 
 	<script type="text/javascript" src="./js/main.js"></script>

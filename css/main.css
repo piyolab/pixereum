@@ -89,3 +89,12 @@ a:hover {
  	margin-right: 60px;
  	margin-bottom: 10px;
 }
+
+.pixel_info_table td {
+	border-bottom: 1px #000000 solid;
+	border-collapse: collapse;
+}
+
+#pixel_detail_sale_status {
+	color: #FF0000;
+}
