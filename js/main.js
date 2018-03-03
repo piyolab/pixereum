@@ -323,10 +323,10 @@ function refreshUpdatePixelSection(pixelData) {
 }
 
 
-function resetField() {
-	$('#pixel_buy_message').val("");
-	$('#pixel_color_picker').val("#00FFFF");
-	$('#pixel_buy_color').val("#00FFFF");
+function resetField(message, color) {
+	$('#pixel_buy_message').val(message);
+	$('#pixel_color_picker').val("#" + color);
+	$('#pixel_buy_color').val("#" + color);
 }
 
 
@@ -378,7 +378,6 @@ function getPixelData(x, y, callback) {
 function registerCanvasClick() {
 	canvas.on('click', function(e) {
 
-		resetField();
 		hideSections();
 
 		var p = getMousePosition(e);
@@ -406,10 +405,11 @@ function registerCanvasClick() {
 			$('#pixel_detail_y_hex').text(pixelData.hexY);
 			$('#pixel_detail_number').text(pixelData.pixelNumber)
 			$('#pixel_detail_color_hex').text(pixelData.color);
-			$('#pixel_detail_color_int').text(pixereum.pixels[x][y].intColor);
+			$('#pixel_detail_color_int').text(pixelData.intColor);
 			$('#pixel_detail_owner').text(pixelData.owner);
 			$('#pixel_detail_message').text(pixelData.message);
 			$('#pixel_detail_message').addAutoLink();
+			resetField(pixelData.message, pixelData.color);
 			$('#pixel_sale_status').val(pixelData.isSale);
 			if (pixelData.isSale) {
 				$('#pixel_detail_sale_status').text("for sale");
@@ -433,6 +433,7 @@ function registerMouseMove() {
 		// console.log("x:", p.x, "y:", p.y);
 		$('#info_pixel_x').text(p.x);
 		$('#info_pixel_y').text(p.y);
+		$('#info_pixel_number').text(getPixelNumber(p.x, p.y));
 	});
 }
 
@@ -490,7 +491,7 @@ function initApp() {
 	    $('#modal_about').iziModal({
 			title: 'about this project',
 			padding: 100,
-			width: 1000,
+			width: 800,
 			closeButton: true	
 		});
 	    $('#modal_about').iziModal('open');
