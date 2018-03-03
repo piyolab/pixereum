@@ -258,26 +258,29 @@ function registerDirectPixelBuyButton() {
 function registerUpdateButtons() {
 	
 	$('#update_color').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
 		var colorCode = $('#update_color_input').val();
-		var inputs = getPixelBuyInputs();
-		var pixelNumber = getPixelNumber(inputs.x, inputs.y);
 		var intColor = getIntColor(colorCode);
-		pixereum.contract.setColor(pixelNumber, 
-									intColor,	
-									(error, result) => {
-			if (result) showTransactionResult(result);
+		pixereum.contract.setColor(pixelNumber, intColor, (err, res) => {
+			if (res) showTransactionResult(res);
+		});
+	});
+
+
+	$('#update_message').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
+		var message = $('#update_message_input').val();
+		pixereum.contract.setMessage(pixelNumber, message, (err, res) => {
+			if (res) showTransactionResult(res);
 		});
 	});
 
 
 	$('#update_sale').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
 		var isSale = $('input[name=isSale]:eq(0)').prop('checked');
-		var inputs = getPixelBuyInputs();
-		var pixelNumber = getPixelNumber(inputs.x, inputs.y);
-		pixereum.contract.setSaleState(pixelNumber, 
-										isSale,	
-										(error, result) => {
-			if (result) showTransactionResult(result);
+		pixereum.contract.setSaleState(pixelNumber, isSale,	(err, res) => {
+			if (res) showTransactionResult(res);
 		});
 	});
 }
@@ -368,6 +371,7 @@ function registerCanvasClick() {
 		$('#pixel_detail_y').text(y);
 		$('#pixel_x').val(x);
 		$('#pixel_y').val(y);
+		$('#pixel_number').val(pixelNumber);
 
 		if (pixereum.isMetaMask) {
 			$('#pixel_buy_owner').val(window.web3.eth.accounts[0]);			
