@@ -256,22 +256,30 @@ function registerDirectPixelBuyButton() {
 
 
 function registerUpdateButtons() {
-	$('#update_sale').click(function(e) {
-		var isSale = $('input[name=isSale]:eq(0)').prop('checked');
-		console.log(isSale);
+	
+	$('#update_color').click(function(e) {
+		var colorCode = $('#update_color_input').val();
 		var inputs = getPixelBuyInputs();
 		var pixelNumber = getPixelNumber(inputs.x, inputs.y);
+		var intColor = getIntColor(colorCode);
+		pixereum.contract.setColor(pixelNumber, 
+									intColor,	
+									(error, result) => {
+			if (result) showTransactionResult(result);
+		});
+	});
 
+
+	$('#update_sale').click(function(e) {
+		var isSale = $('input[name=isSale]:eq(0)').prop('checked');
+		var inputs = getPixelBuyInputs();
+		var pixelNumber = getPixelNumber(inputs.x, inputs.y);
 		pixereum.contract.setSaleState(pixelNumber, 
 										isSale,	
 										(error, result) => {
-			console.log(result);
-			if (result) {
-				showTransactionResult(result);
-			}
+			if (result) showTransactionResult(result);
 		});
-
-	});	
+	});
 }
 
 
