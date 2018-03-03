@@ -257,6 +257,14 @@ function registerDirectPixelBuyButton() {
 
 function registerUpdateButtons() {
 	
+	$('#update_owner').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
+		var address = $('#update_owner_input').val();
+		pixereum.contract.setOwner(pixelNumber, address, (err, res) => {
+			if (res) showTransactionResult(res);
+		});
+	});
+
 	$('#update_color').click(function(e) {
 		var pixelNumber = $('#pixel_number').val();
 		var colorCode = $('#update_color_input').val();
