@@ -1,9 +1,14 @@
-var isMainnet = true;
+var isMainnet = false;
 
 var pixereum = {};								// store global variables
 
 var SIZE = 100;									// number of columns (rows)
-var PIXEL_SIZE = 12;							// pixel width (height)
+var PIXEL_SIZE = 10;							// pixel width (height)
+
+var width = $(window).width();
+if(width < 800) {
+	PIXEL_SIZE = width/100;
+}
 
 var CONTRACT_ADDRESS = [
 "0xBFC28Cd8b0F3AdBF0686DBF97dE4212eFf5A42b9",	// Ropsten
@@ -50,8 +55,12 @@ function getIntColor(colorCode) {
 	g = parseInt(colorCode.substr(2,2), 16);
 	b = parseInt(colorCode.substr(4,2), 16);
 	colorInt = r*256*256 + g*256 + b;
-	console.log(colorInt);
+	// console.log(colorInt);
 	return colorInt;
+}
+
+function getHexCoordString(coord) {
+	return ('00' + coord.toString(16).toUpperCase()).substr(-2);
 }
 
 function getHexColorString(val) {
@@ -67,6 +76,7 @@ function addGrid(canvas, context){
 	context.beginPath();
 	context.strokeStyle = "#FFFFFF";
 	context.lineWidth = 0.3;
+	if (width < 800) context.lineWidth = 0.1;
 	for(i = 0; i < SIZE+1; i++) {
 		step = (i * PIXEL_SIZE);		
 		context.moveTo(step, 0);
@@ -149,55 +159,233 @@ function registerModals() {
 		group: "detail",
 		padding: 20,
 		width: 600,
-		closeButton: true	
-	});
-
-	$('#modal_pixel_buy_detail').iziModal({
-		title: 'buy pixel',
-		group: "detail",
-		padding: 20,
-		width: 600,
 		fullscreen: true,
 		closeButton: true	
 	});
 }
 
+
+function getPixelBuyInputs() {
+	return {
+		x: parseInt($('#pixel_x').val()),
+		y: parseInt($('#pixel_y').val()),
+		owner: $('#pixel_buy_owner').val(),
+		color: $('#pixel_buy_color').val(),
+		message: $('#pixel_buy_message').val(),
+		price: $('#pixel_price').val(),
+	}
+}
+
+
+function checkSaleStatus() {
+	var isSale = $('#pixel_sale_status').val();
+	if(isSale != "true") {
+		return false;
+	} else {
+		return true;
+	}
+}
+
+
+function showTransactionResult(result) {
+	$('#tx_result').empty();
+	var baseUrl = "https://etherscan.io/tx/";
+	if (!isMainnet) baseUrl = "https://ropsten.etherscan.io/tx/";
+	var url = baseUrl + result;
+	$('#tx_result').append($( "<a>", {
+		href: url,
+		text: "etherscan: " + result,
+		target: "_blank"
+	}));
+	$('#transaction_result').show();
+}
+
+
 function registerPixelBuyButton() {
 
-	$('#modal_pixel_detail_buy').click(function(e) {
-		$('#modal_pixel_detail').iziModal('next');
-	});
+	$('#pixel_buy_button_metamask').click(function(e) {
+		console.log("buy width MetaMask!");
+		$('#transaction_result').hide();
 
-	$('#pixel_buy_button').click(function(e) {
-		console.log("buy!");
-		var x = $('#pixel_x').val();
-		var y = $('#pixel_y').val();
-		var pixelNumber = getPixelNumber(parseInt(x, 10), parseInt(y, 10));
-		var owner = $('#pixel_buy_owner').val();
-		var color = $('#pixel_buy_color').val();
-		var intColor = getIntColor(color);
-		var message = $('#pixel_buy_message').val();
-		var price = $('#pixel_price').val();
-		var weiValue = web3.toWei(price, "ether");
-		console.log(owner);
-		console.log("pixelNumber", pixelNumber);
-		console.log("color", color);
-		console.log("intColor", intColor);
-		console.log(message);
-		console.log(price);
+		if (!checkSaleStatus()) {
+			alert("This pixel is currently not for sale.");
+			return;
+		}
 
-		pixereum.contract.buyPixel(owner, pixelNumber, intColor, message,
+		var inputs = getPixelBuyInputs();
+		console.log(inputs);
+		var intColor = getIntColor(inputs.color);
+		var pixelNumber = getPixelNumber(inputs.x, inputs.y);
+		var weiValue = web3.toWei(inputs.price, "ether");
+
+		pixereum.contract.buyPixel(inputs.owner,
+									pixelNumber,
+									intColor,
+									inputs.message,
 								   {value:weiValue},
-		function(error, result) {
+								   function(error, result) {
 			console.log(result);
+			if (result) {
+				showTransactionResult(result);
+			}
 		});
-
 
 	});	
 }
 
+
+function registerDirectPixelBuyButton() {
+	$('#pixel_buy_button_direct').click(function(e) {
+		console.log("buy directly!");
+
+		if (!checkSaleStatus()) {
+			alert("This pixel is currently not for sale.");
+			return;
+		}
+
+		var inputs = getPixelBuyInputs();
+		console.log(inputs);
+		var hexX = getHexCoordString(inputs.x);
+		var hexY = getHexCoordString(inputs.y);
+		var colorCode = inputs.color.slice(1);
+
+		var data = "0x" + hexX + hexY + colorCode;
+
+		$('#pixel_direct_address').val(pixereum.address);		
+		$('#pixel_direct_price').val(inputs.price);
+		$('#pixel_direct_data').val(data);
+
+		$('#get_pixel_direct').show();
+
+	});
+}
+
+
+function registerUpdateButtons() {
+	
+	$('#update_owner').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
+		var address = $('#update_owner_input').val();
+		pixereum.contract.setOwner(pixelNumber, address, (err, res) => {
+			if (res) showTransactionResult(res);
+		});
+	});
+
+	$('#update_color').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
+		var colorCode = $('#update_color_input').val();
+		var intColor = getIntColor(colorCode);
+		pixereum.contract.setColor(pixelNumber, intColor, (err, res) => {
+			if (res) showTransactionResult(res);
+		});
+	});
+
+	$('#update_message').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
+		var message = $('#update_message_input').val();
+		pixereum.contract.setMessage(pixelNumber, message, (err, res) => {
+			if (res) showTransactionResult(res);
+		});
+	});
+
+	$('#update_price').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
+		var price = $('#update_price_input').val();
+		if (price <= 0) {
+			alert("Error. Price should be more than 0");
+			return;
+		}
+		var weiValue = web3.toWei(price, "ether");
+		pixereum.contract.setPrice(pixelNumber, weiValue, (err, res) => {
+			if (res) showTransactionResult(res);
+		});
+	});
+
+	$('#update_sale').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
+		var isSale = $('input[name=isSale]:eq(0)').prop('checked');
+		pixereum.contract.setSaleState(pixelNumber, isSale,	(err, res) => {
+			if (res) showTransactionResult(res);
+		});
+	});
+}
+
+
+function refreshUpdatePixelSection(pixelData) {
+	if(pixereum.isMetaMask != true) return;
+	if(pixelData.owner != window.web3.eth.accounts[0]) return;
+	console.log("pixelData", pixelData);
+	$('#get_pixel').hide();
+	$('#update_color_input').val('#'+pixelData.color);
+	$('#update_color_picker').val('#'+pixelData.color);
+	$('#update_message_input').val(pixelData.message);
+	$('#update_price_input').val(pixelData.ethPrice);
+	if (pixelData.isSale) {
+		$('input[name=isSale]:eq(0)').prop('checked', true);
+	} else {
+		$('input[name=isSale]:eq(1)').prop('checked', true);
+	}
+	$('#update_pixel_section').show();
+}
+
+
+function resetField(message, color) {
+	$('#pixel_buy_message').val(message);
+	$('#pixel_color_picker').val("#" + color);
+	$('#pixel_buy_color').val("#" + color);
+}
+
+
+function hideSections() {
+	$('#get_pixel').hide();
+	$('#get_pixel_direct').hide();
+	$('#transaction_result').hide();
+	$('#update_pixel_section').hide();
+}
+
+function hideDetails() {
+	if(pixereum.isMetaMask == true) {
+		$('#pixel_buy_button_direct').hide();
+	} else {
+		$(".metamask").map(function(){
+    		return $(this).hide();
+		});
+	}
+}
+
+
+function getPixelData(x, y, callback) {
+	pixereum.contract.getPixel(getPixelNumber(x, y), function(error, result){
+		if(!error) {
+        	console.log(result);
+        	var pixelData = {};
+			pixelData.x = x;
+			pixelData.y = y;
+			pixelData.hexX = getHexCoordString(x); 
+			pixelData.hexY = getHexCoordString(y);
+			pixelData.pixelNumber = pixereum.pixels[x][y].pixelNumber;
+			pixelData.color = pixereum.pixels[x][y].color;
+			pixelData.intColor = pixereum.pixels[x][y].intColor;
+			pixelData.owner = result[0];
+			pixelData.message = result[1];
+			pixelData.ethPrice = result[2]["c"][0]/10000;
+			pixelData.isSale = result[3];
+        	callback(pixelData);
+    	} else {
+        	console.error(error);
+    	}
+	});
+}
+
+
+
+
+
 function registerCanvasClick() {
 	canvas.on('click', function(e) {
+
+		hideSections();
+
 		var p = getMousePosition(e);
 		var x = p.x;
 		var y = p.y;
@@ -208,45 +396,39 @@ function registerCanvasClick() {
 
 	    $('#modal_pixel_detail').iziModal('open');
 	    $('#modal_pixel_detail').iziModal('startLoading');
-		$('.pixel_x').text(x);
-		$('.pixel_y').text(y);
+		$('#pixel_detail_x').text(x);
+		$('#pixel_detail_y').text(y);
 		$('#pixel_x').val(x);
 		$('#pixel_y').val(y);
+		$('#pixel_number').val(pixelNumber);
 
 		if (pixereum.isMetaMask) {
 			$('#pixel_buy_owner').val(window.web3.eth.accounts[0]);			
 		}
 
-		var pixelData = {};
-		pixereum.contract.getPixel(getPixelNumber(x, y), function(error, result){
-			if(!error) {
-	        	console.log(result);
-				pixelData.hexX = ('00' + x.toString(16).toUpperCase()).substr(-2); 
-				pixelData.hexY = ('00' + y.toString(16).toUpperCase()).substr(-2);
-				pixelData.owner = result[0];
-				pixelData.message = result[1];
-				pixelData.ethPrice = result[2]["c"][0]/10000;
-				pixelData.isSale = result[3];
-				$('#modal_pixel_detail_hex_x').text(pixelData.hexX);
-				$('#modal_pixel_detail_hex_y').text(pixelData.hexY);
-				$('#modal_pixel_detail_pixel_number').text(pixereum.pixels[x][y].pixelNumber)
-				$('#modal_pixel_detail_color_hex').text(pixereum.pixels[x][y].color);
-				$('#modal_pixel_detail_color_int').text(pixereum.pixels[x][y].intColor);
-				$('#modal_pixel_detail_owner').text(pixelData.owner);
-				$('#modal_pixel_detail_message').text(pixelData.message);
-				$('#modal_pixel_detail_message').addAutoLink();
-				if (pixelData.isSale) {
-					$('.pixel_sale').text("for sale");
-				} else {
-					$('.pixel_sale').text("not for sale");
-				}
-				$('.pixel_price').text(pixelData.ethPrice);
-				$('#pixel_price').val(pixelData.ethPrice);
-			    $('#modal_pixel_detail').iziModal('stopLoading');
-	    	} else {
-	        	console.error(error);
-	    	}
+		getPixelData(x, y, (pixelData) => {
+			$('#pixel_detail_x_hex').text(pixelData.hexX);
+			$('#pixel_detail_y_hex').text(pixelData.hexY);
+			$('#pixel_detail_number').text(pixelData.pixelNumber)
+			$('#pixel_detail_color_hex').text(pixelData.color);
+			$('#pixel_detail_color_int').text(pixelData.intColor);
+			$('#pixel_detail_owner').text(pixelData.owner);
+			$('#pixel_detail_message').text(pixelData.message);
+			$('#pixel_detail_message').addAutoLink();
+			resetField(pixelData.message, pixelData.color);
+			$('#pixel_sale_status').val(pixelData.isSale);
+			if (pixelData.isSale) {
+				$('#pixel_detail_sale_status').text("for sale");
+			} else {
+				$('#pixel_detail_sale_status').text("not for sale");
+			}
+			$('#pixel_detail_price').text(pixelData.ethPrice);
+			$('#pixel_price').val(pixelData.ethPrice);
+			$('#get_pixel').show();
+			refreshUpdatePixelSection(pixelData);
+		    $('#modal_pixel_detail').iziModal('stopLoading');
 		});
+
 	});
 }
 
@@ -257,8 +439,33 @@ function registerMouseMove() {
 		// console.log("x:", p.x, "y:", p.y);
 		$('#info_pixel_x').text(p.x);
 		$('#info_pixel_y').text(p.y);
+		$('#info_pixel_number').text(getPixelNumber(p.x, p.y));
 	});
 }
+
+
+function registerColorPicker() {
+	$('#pixel_color_picker').on("change", function(){
+		var colorHex = $('#pixel_color_picker').val();
+		$('#pixel_buy_color').val(colorHex);
+	});
+	$('#pixel_buy_color').on("change", function(){
+		var colorHex = $('#pixel_buy_color').val();
+		$('#pixel_color_picker').val(colorHex);
+	});
+}
+
+function registerUpdateColorPicker() {
+	$('#update_color_picker').on("change", function(){
+		var colorHex = $('#update_color_picker').val();
+		$('#update_color_input').val(colorHex);
+	});
+	$('#update_color_input').on("change", function(){
+		var colorHex = $('#update_color_input').val();
+		$('#update_color_picker').val(colorHex);
+	});
+}
+
 
 
 function initApp() {
@@ -272,6 +479,11 @@ function initApp() {
 		registerCanvasClick();
 		registerMouseMove();
 		registerPixelBuyButton();
+		registerDirectPixelBuyButton();
+		registerColorPicker();
+		registerUpdateColorPicker();
+		hideDetails();
+		registerUpdateButtons();
 	});
 
 	// info_panel
@@ -285,7 +497,7 @@ function initApp() {
 	    $('#modal_about').iziModal({
 			title: 'about this project',
 			padding: 100,
-			width: 1000,
+			width: 800,
 			closeButton: true	
 		});
 	    $('#modal_about').iziModal('open');
