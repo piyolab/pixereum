@@ -308,12 +308,17 @@ function registerUpdateButtons() {
 function refreshUpdatePixelSection(pixelData) {
 	if(pixereum.isMetaMask != true) return;
 	if(pixelData.owner != window.web3.eth.accounts[0]) return;
+	console.log("pixelData", pixelData);
 	$('#get_pixel').hide();
 	$('#update_color_input').val('#'+pixelData.color);
 	$('#update_color_picker').val('#'+pixelData.color);
 	$('#update_message_input').val(pixelData.message);
-	$('#update_price_input').val(pixelData.price);
-	$('input[name=isSale]').val(pixelData.isSale);
+	$('#update_price_input').val(pixelData.ethPrice);
+	if (pixelData.isSale) {
+		$('input[name=isSale]:eq(0)').prop('checked', true);
+	} else {
+		$('input[name=isSale]:eq(1)').prop('checked', true);
+	}
 	$('#update_pixel_section').show();
 }
 
