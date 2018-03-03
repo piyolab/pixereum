@@ -274,7 +274,6 @@ function registerUpdateButtons() {
 		});
 	});
 
-
 	$('#update_message').click(function(e) {
 		var pixelNumber = $('#pixel_number').val();
 		var message = $('#update_message_input').val();
@@ -283,6 +282,18 @@ function registerUpdateButtons() {
 		});
 	});
 
+	$('#update_price').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
+		var price = $('#update_price_input').val();
+		if (price <= 0) {
+			alert("Error. Price should be more than 0");
+			return;
+		}
+		var weiValue = web3.toWei(price, "ether");
+		pixereum.contract.setPrice(pixelNumber, weiValue, (err, res) => {
+			if (res) showTransactionResult(res);
+		});
+	});
 
 	$('#update_sale').click(function(e) {
 		var pixelNumber = $('#pixel_number').val();
