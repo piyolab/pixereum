@@ -259,8 +259,10 @@ function resetField() {
 
 
 function hideSections() {
+	$('#get_pixel').hide();
 	$('#get_pixel_direct').hide();
 	$('#transaction_result').hide();
+	$('#update_pixel_section').hide();
 }
 
 function hideDetails() {
@@ -279,8 +281,13 @@ function getPixelData(x, y, callback) {
 		if(!error) {
         	console.log(result);
         	var pixelData = {};
+			pixelData.x = x;
+			pixelData.y = y;
 			pixelData.hexX = getHexCoordString(x); 
 			pixelData.hexY = getHexCoordString(y);
+			pixelData.pixelNumber = pixereum.pixels[x][y].pixelNumber;
+			pixelData.color = pixereum.pixels[x][y].color;
+			pixelData.intColor = pixereum.pixels[x][y].intColor;
 			pixelData.owner = result[0];
 			pixelData.message = result[1];
 			pixelData.ethPrice = result[2]["c"][0]/10000;
@@ -290,6 +297,17 @@ function getPixelData(x, y, callback) {
         	console.error(error);
     	}
 	});
+}
+
+
+function refreshUpdatePixelSection(pixelData) {
+
+	if(pixereum.isMetaMask != true) return;
+	if(pixelData.owner != window.web3.eth.accounts[0]) return;
+	$('#get_pixel').hide();
+	$('#update_pixel_section').show();
+
+
 }
 
 
@@ -321,8 +339,8 @@ function registerCanvasClick() {
 		getPixelData(x, y, (pixelData) => {
 			$('#pixel_detail_x_hex').text(pixelData.hexX);
 			$('#pixel_detail_y_hex').text(pixelData.hexY);
-			$('#pixel_detail_number').text(pixereum.pixels[x][y].pixelNumber)
-			$('#pixel_detail_color_hex').text(pixereum.pixels[x][y].color);
+			$('#pixel_detail_number').text(pixelData.pixelNumber)
+			$('#pixel_detail_color_hex').text(pixelData.color);
 			$('#pixel_detail_color_int').text(pixereum.pixels[x][y].intColor);
 			$('#pixel_detail_owner').text(pixelData.owner);
 			$('#pixel_detail_message').text(pixelData.message);
@@ -335,6 +353,8 @@ function registerCanvasClick() {
 			}
 			$('#pixel_detail_price').text(pixelData.ethPrice);
 			$('#pixel_price').val(pixelData.ethPrice);
+			$('#get_pixel').show();
+			refreshUpdatePixelSection(pixelData);
 		    $('#modal_pixel_detail').iziModal('stopLoading');
 		});
 
@@ -363,6 +383,10 @@ function registerColorPicker() {
 	});
 }
 
+function registerUpdateButtons() {
+
+}
+
 
 function initApp() {
 	initSettings();
@@ -378,6 +402,7 @@ function initApp() {
 		registerDirectPixelBuyButton();
 		registerColorPicker();
 		hideDetails();
+		registerUpdateButtons();
 	});
 
 	// info_panel
