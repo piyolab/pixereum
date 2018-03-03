@@ -112,7 +112,7 @@
 			</div>
 			<br />
 			<p class="metamask">
-				Message: <input type="text" id="pixel_buy_message">
+				Message: <input type="text" id="pixel_buy_message" size="50">
 			</p>
 			<div class="notice metamask">
 				Be carefull. Your message will remain permanently on the blockchain.
@@ -163,14 +163,6 @@
 			</table>
 		</div>
 
-		<div id="transaction_result">
-			<br />
-			<div class="modal_section">
-				Transaction Result
-			</div>
-			<div id="tx_result"></div>
-		</div>
-
 		<div id="update_pixel_section">
 			<br />
 			<div class="modal_section">
@@ -189,24 +181,34 @@
 				</tr>
 				<tr>
 					<td>Message</td>
-					<td><input type="text" id="update_message_input"></td>
+					<td><input type="text" id="update_message_input" size="50"></td>
 					<td><button id="update_message">update</button></td>
 				</tr>
 				<tr>
 					<td>Price</td>
-					<td><input type="number" id="update_price_input"></td>
+					<td><input type="number" id="update_price_input"> ETH</td>
 					<td><button id="update_price">update</button></td>
 				</tr>
 				<tr>
 					<td>Sale Satatus</td>
 					<td>
 						<input type=radio name="isSale" value="true"> for sale 
-						<input type=radio name="isSale" value="false" checked> not for sale
+						<input type=radio name="isSale" value="false"> not for sale
 					</td>
 					<td><button id="update_sale">update</button></td>
 				</tr>
 			</table>
 		</div>
+
+		<div id="transaction_result">
+			<br />
+			<div class="modal_section">
+				Transaction Result
+			</div>
+			<div id="tx_result"></div>
+			<p>Wait few seconds - minutes and refresh page to check updates.</p>
+		</div>
+
 	</div>
 
 	<script type="text/javascript" src="./js/main.js"></script>

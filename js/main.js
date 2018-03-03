@@ -181,6 +181,20 @@ function checkSaleStatus() {
 }
 
 
+function showTransactionResult(result) {
+	$('#tx_result').empty();
+	var baseUrl = "https://etherscan.io/tx/";
+	if (!isMainnet) baseUrl = "https://ropsten.etherscan.io/tx/";
+	var url = baseUrl + result;
+	$('#tx_result').append($( "<a>", {
+		href: url,
+		text: "etherscan: " + result,
+		target: "_blank"
+	}));
+	$('#transaction_result').show();
+}
+
+
 function registerPixelBuyButton() {
 
 	$('#pixel_buy_button_metamask').click(function(e) {
@@ -206,17 +220,7 @@ function registerPixelBuyButton() {
 								   function(error, result) {
 			console.log(result);
 			if (result) {
-				$('#tx_result').empty();
-				var baseUrl = "https://etherscan.io/tx/";
-				if (!isMainnet) baseUrl = "https://ropsten.etherscan.io/tx/";
-				var url = baseUrl + result;
-				$('#tx_result').append($( "<a>", {
-					href: url,
-					text: "etherscan: " + result,
-					target: "_blank"
-				}));
-
-				$('#transaction_result').show();
+				showTransactionResult(result);
 			}
 		});
 
@@ -248,6 +252,39 @@ function registerDirectPixelBuyButton() {
 		$('#get_pixel_direct').show();
 
 	});
+}
+
+
+function registerUpdateButtons() {
+	$('#update_sale').click(function(e) {
+		var isSale = $('input[name=isSale]:eq(0)').prop('checked');
+		console.log(isSale);
+		var inputs = getPixelBuyInputs();
+		var pixelNumber = getPixelNumber(inputs.x, inputs.y);
+
+		pixereum.contract.setSaleState(pixelNumber, 
+										isSale,	
+										(error, result) => {
+			console.log(result);
+			if (result) {
+				showTransactionResult(result);
+			}
+		});
+
+	});	
+}
+
+
+function refreshUpdatePixelSection(pixelData) {
+	if(pixereum.isMetaMask != true) return;
+	if(pixelData.owner != window.web3.eth.accounts[0]) return;
+	$('#get_pixel').hide();
+	$('#update_color_input').val('#'+pixelData.color);
+	$('#update_color_picker').val('#'+pixelData.color);
+	$('#update_message_input').val(pixelData.message);
+	$('#update_price_input').val(pixelData.price);
+	$('input[name=isSale]').val(pixelData.isSale);
+	$('#update_pixel_section').show();
 }
 
 
@@ -300,15 +337,7 @@ function getPixelData(x, y, callback) {
 }
 
 
-function refreshUpdatePixelSection(pixelData) {
 
-	if(pixereum.isMetaMask != true) return;
-	if(pixelData.owner != window.web3.eth.accounts[0]) return;
-	$('#get_pixel').hide();
-	$('#update_pixel_section').show();
-
-
-}
 
 
 function registerCanvasClick() {
@@ -383,9 +412,17 @@ function registerColorPicker() {
 	});
 }
 
-function registerUpdateButtons() {
-
+function registerUpdateColorPicker() {
+	$('#update_color_picker').on("change", function(){
+		var colorHex = $('#update_color_picker').val();
+		$('#update_color_input').val(colorHex);
+	});
+	$('#update_color_input').on("change", function(){
+		var colorHex = $('#update_color_input').val();
+		$('#update_color_picker').val(colorHex);
+	});
 }
+
 
 
 function initApp() {
@@ -401,6 +438,7 @@ function initApp() {
 		registerPixelBuyButton();
 		registerDirectPixelBuyButton();
 		registerColorPicker();
+		registerUpdateColorPicker();
 		hideDetails();
 		registerUpdateButtons();
 	});
