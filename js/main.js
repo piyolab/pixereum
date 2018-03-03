@@ -3,7 +3,12 @@ var isMainnet = false;
 var pixereum = {};								// store global variables
 
 var SIZE = 100;									// number of columns (rows)
-var PIXEL_SIZE = 12;							// pixel width (height)
+var PIXEL_SIZE = 10;							// pixel width (height)
+
+var width = $(window).width();
+if(width < 800) {
+	PIXEL_SIZE = width/100;
+}
 
 var CONTRACT_ADDRESS = [
 "0xBFC28Cd8b0F3AdBF0686DBF97dE4212eFf5A42b9",	// Ropsten
@@ -71,6 +76,7 @@ function addGrid(canvas, context){
 	context.beginPath();
 	context.strokeStyle = "#FFFFFF";
 	context.lineWidth = 0.3;
+	if (width < 800) context.lineWidth = 0.1;
 	for(i = 0; i < SIZE+1; i++) {
 		step = (i * PIXEL_SIZE);		
 		context.moveTo(step, 0);
