@@ -77,10 +77,11 @@ function fillPixel(context, x, y, color) {
 function addGrid(canvas, context){
 	context.beginPath();		
 	context.strokeStyle = "#FFFFFF";
-	context.lineWidth = 0.5;
-	if (width < 800) context.lineWidth = 0.4;
+	context.lineWidth = 0.4;
+	context.lineWidth = 0.3;
 	for(i = 0; i < SIZE+1; i++) {
-		step = (i * PIXEL_SIZE) + 0.2;
+		step = (i * PIXEL_SIZE);
+		if (width < 800) step = step + 0.2
 		context.moveTo(step, 0);
 		context.lineTo(step, canvasSize);
 		context.moveTo(0, step);
@@ -476,6 +477,7 @@ function initApp() {
 	initContract();
 
 	getPixels(()=>{
+		addGrid(canvas, context);
 		registerModals();
 		registerCanvasClick();
 		registerMouseMove();
@@ -485,7 +487,6 @@ function initApp() {
 		registerUpdateColorPicker();
 		hideDetails();
 		registerUpdateButtons();
-		addGrid(canvas, context);
 	});
 
 	// info_panel
