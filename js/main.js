@@ -41,7 +41,7 @@ var canvas = $('<canvas>').attr({
   id: "canvas"
 })
 
-canvas.css({'width':canvasSize/2, 'height':canvasSize/2});
+canvas.css({'width':canvasSize/2, 'height':canvasSize/2, 'background-color':'#000000'});
 
 // add canvas
 $('#main_box').append(canvas);
@@ -75,19 +75,18 @@ function fillPixel(context, x, y, color) {
 }
 
 function addGrid(canvas, context){
-	
+	context.beginPath();		
 	context.strokeStyle = "#FFFFFF";
-	context.lineWidth = 0.4;
-	if (width < 800) return;
+	context.lineWidth = 0.5;
+	if (width < 800) context.lineWidth = 0.4;
 	for(i = 0; i < SIZE+1; i++) {
-		step = (i * PIXEL_SIZE);
-		context.beginPath();		
+		step = (i * PIXEL_SIZE) + 0.2;
 		context.moveTo(step, 0);
 		context.lineTo(step, canvasSize);
 		context.moveTo(0, step);
 		context.lineTo(canvasSize, step);
-		context.stroke();
 	}
+	context.stroke();
 }
 
 function getMousePosition(e) {
@@ -477,7 +476,6 @@ function initApp() {
 	initContract();
 
 	getPixels(()=>{
-		addGrid(canvas, context);
 		registerModals();
 		registerCanvasClick();
 		registerMouseMove();
@@ -487,6 +485,7 @@ function initApp() {
 		registerUpdateColorPicker();
 		hideDetails();
 		registerUpdateButtons();
+		addGrid(canvas, context);
 	});
 
 	// info_panel
