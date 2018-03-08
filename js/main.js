@@ -77,7 +77,7 @@ function fillPixel(context, x, y, color) {
 function addGrid(canvas, context){
 	context.beginPath();
 	context.strokeStyle = "#FFFFFF";
-	context.lineWidth = 0.4;
+	context.lineWidth = 1;
 	if (width < 800) context.lineWidth = 0.1;
 	for(i = 0; i < SIZE+1; i++) {
 		step = (i * PIXEL_SIZE);		
