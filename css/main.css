@@ -114,6 +114,9 @@ a:hover {
 		width: 100%;
 		height: 60px;
 	}
+	#info_panel p {
+		font-size: 80%;
+	}
 	#links {
 		display: none;
 	}
