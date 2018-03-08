@@ -3,11 +3,11 @@ var isMainnet = true;
 var pixereum = {};								// store global variables
 
 var SIZE = 100;									// number of columns (rows)
-var PIXEL_SIZE = 10;							// pixel width (height)
+var PIXEL_SIZE = 10 * 2;							// pixel width (height)
 
-var width = $(window).width();
+var width = $(window).width()
 if(width < 800) {
-	PIXEL_SIZE = width/100;
+	PIXEL_SIZE = width/100 * 2;
 }
 
 var CONTRACT_ADDRESS = [
@@ -40,6 +40,8 @@ var canvas = $('<canvas>').attr({
   height: canvasSize,
   id: "canvas"
 })
+
+canvas.css({'width':canvasSize/2, 'height':canvasSize/2});
 
 // add canvas
 $('#main_box').append(canvas);
@@ -89,8 +91,8 @@ function addGrid(canvas, context){
 
 function getMousePosition(e) {
 	var rect = e.target.getBoundingClientRect();
-	var x = e.clientX - rect.left <= 0 ? 0 : Math.floor((e.clientX - rect.left) / PIXEL_SIZE);
-	var y = e.clientY - rect.top <= 0 ? 0 : Math.floor((e.clientY - (rect.top+0.01)) / PIXEL_SIZE);
+	var x = e.clientX - rect.left <= 0 ? 0 : Math.floor((e.clientX - rect.left) / PIXEL_SIZE * 2);
+	var y = e.clientY - rect.top <= 0 ? 0 : Math.floor((e.clientY - (rect.top+0.01)) / PIXEL_SIZE * 2);
 	return {x:x, y:y};
 }
 
