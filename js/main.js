@@ -78,7 +78,7 @@ function addGrid(canvas, context){
 	
 	context.strokeStyle = "#FFFFFF";
 	context.lineWidth = 0.4;
-	if (width < 800) context.lineWidth = 0.4;
+	if (width < 800) context.lineWidth = 0.1;
 	for(i = 0; i < SIZE+1; i++) {
 		step = (i * PIXEL_SIZE);
 		context.beginPath();		
