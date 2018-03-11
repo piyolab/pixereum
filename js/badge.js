@@ -140,12 +140,13 @@ function setupIframe() {
 	document.body.style.padding = "0px";
 
 	var iframe = document.createElement('iframe');
-	document.getElementById('__pixereum__').appendChild(iframe);
+	var ins = document.getElementById('__pixereum__');
+	ins.appendChild(iframe);
 	iframe.style.margin = "0px";
 	iframe.style.padding = "0px";
 	iframe.style.border = "none";
-	iframe.style.width = "300px";
-	iframe.style.height = "300px";
+	iframe.style.width = ins.style.width;
+	iframe.style.height = ins.style.width;
 	iframe.style.backgroundColor = "#000000";
 	
 	var doc = iframe.contentWindow.document;
@@ -153,7 +154,7 @@ function setupIframe() {
 	var img_url = canvasImageUrl();
 	doc.write('<style>body{margin:0px}</style>');
 	doc.write('<a href="http://pixereum.io" target="_blank">'
-		+ '<img src="' + img_url + '" width="300px" style="padding:0px; margin:0px" />'
+		+ '<img src="' + img_url + '" width="100%" height="100%" style="padding:0px; margin:0px" />'
 		+ '</a>');
 	doc.close();
 }
