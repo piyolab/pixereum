@@ -376,7 +376,6 @@ function getPixelData(x, y, callback) {
 			pixelData.hexY = getHexCoordString(y);
 			pixelData.pixelNumber = pixereum.pixels[x][y].pixelNumber;
 			pixelData.color = pixereum.pixels[x][y].color;
-			pixelData.intColor = pixereum.pixels[x][y].intColor;
 			pixelData.owner = result[0];
 			pixelData.message = result[1];
 			pixelData.ethPrice = web3.utils.fromWei(result[2]);
