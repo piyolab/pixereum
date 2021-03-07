@@ -117,9 +117,10 @@ function initSettings() {
 
 
 function initWeb3(){
-  if (typeof web3 !== 'undefined') {
-    console.log('Using MetaMask!')
-    window.web3 = new Web3(web3.currentProvider);
+  if (window.ethereum) {
+    console.log('Using Browser provider!');
+    window.web3 = new Web3(window.ethereum);
+    window.ethereum.enable();
     pixereum.isMetaMask = true;
   } else {
     console.log('Using HTTP provider!')
