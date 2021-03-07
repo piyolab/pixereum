@@ -132,18 +132,18 @@ function initWeb3(){
 function initContract() {
 	var address = CONTRACT_ADDRESS[1];
 	if (!isMainnet) address = CONTRACT_ADDRESS[0];
-	pixereum.contract = window.web3.eth.contract(CONTRACT_ABI).at(pixereum.address);
+	pixereum.contract = new window.web3.eth.Contract(CONTRACT_ABI, pixereum.address);
 }
 
 
 function getPixels(callback) {
-	pixereum.contract.getColors(function(error, result){
+	pixereum.contract.methods.getColors().call(function(error, result){
 		if(!error) {
         	console.log(result);
         	$.each(pixereum.pixels, function(xIndex, xVal){
 				$.each(pixereum.pixels[xIndex], function(yIndex, Val){
 					var pixelNumber = getPixelNumber(xIndex, yIndex);
-					var intColor = parseInt(result[pixelNumber]["c"]);
+					var intColor = parseInt(result[pixelNumber]);
 					var hexColorString = getHexColorString(intColor);
 					fillPixel(context, xIndex, yIndex, hexColorString);
 					pixereum.pixels[xIndex][yIndex]= {pixelNumber: pixelNumber, intColor: intColor, color: hexColorString};
@@ -358,7 +358,7 @@ function hideDetails() {
 
 
 function getPixelData(x, y, callback) {
-	pixereum.contract.getPixel(getPixelNumber(x, y), function(error, result){
+	pixereum.contract.methods.getPixel(getPixelNumber(x, y)).call(function(error, result){
 		if(!error) {
         	console.log(result);
         	var pixelData = {};
@@ -371,7 +371,7 @@ function getPixelData(x, y, callback) {
 			pixelData.intColor = pixereum.pixels[x][y].intColor;
 			pixelData.owner = result[0];
 			pixelData.message = result[1];
-			pixelData.ethPrice = result[2]["c"][0]/10000;
+			pixelData.ethPrice = web3.utils.fromWei(result[2]);
 			pixelData.isSale = result[3];
         	callback(pixelData);
     	} else {
