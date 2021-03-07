@@ -376,6 +376,7 @@ function getPixelData(x, y, callback) {
 			pixelData.hexY = getHexCoordString(y);
 			pixelData.pixelNumber = pixereum.pixels[x][y].pixelNumber;
 			pixelData.color = pixereum.pixels[x][y].color;
+			pixelData.intColor = pixereum.pixels[x][y].intColor;
 			pixelData.owner = result[0];
 			pixelData.message = result[1];
 			pixelData.ethPrice = web3.utils.fromWei(result[2]);
@@ -407,8 +408,6 @@ function registerCanvasClick() {
 	    $('#modal_pixel_detail').iziModal('open');
 	    $('#modal_pixel_detail').iziModal('startLoading');
 
-		$('#pixel_detail_x').text(x);
-		$('#pixel_detail_y').text(y);
 		$('#pixel_x').val(x);
 		$('#pixel_y').val(y);
 		$('#pixel_number').val(pixelNumber);
@@ -425,11 +424,10 @@ function registerCanvasClick() {
 		}
 
 		getPixelData(x, y, (pixelData) => {
-			$('#pixel_detail_x_hex').text(pixelData.hexX);
-			$('#pixel_detail_y_hex').text(pixelData.hexY);
+			$('#pixel_detail_x').text(x);
+			$('#pixel_detail_y').text(y);
 			$('#pixel_detail_number').text(pixelData.pixelNumber)
 			$('#pixel_detail_color_hex').text(pixelData.color);
-			$('#pixel_detail_color_int').text(pixelData.intColor);
 			$('#pixel_detail_owner').text(pixelData.owner);
 			$('#pixel_detail_message').text(pixelData.message);
 			$('#pixel_detail_message').addAutoLink();
