@@ -103,7 +103,6 @@ function getMousePosition(e) {
   };
 })(jQuery);
 
-
 function initSettings() {
 	if (isMainnet) {
 		// settings for Mainnet
@@ -471,7 +470,19 @@ function registerUpdateColorPicker() {
 
 
 
+function getUrlParam(key) {
+    key = key.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + key + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, ' '));
+}
+
 function initApp() {
+	var network = getUrlParam('network')
+	if (network == '2') {
+		isMainnet = false
+	}
+
 	initSettings();
 	initWeb3();
 	initContract();
