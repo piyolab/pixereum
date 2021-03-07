@@ -20,8 +20,8 @@ var CONTRACT_ABI =
 ;
 
 var DEFAULT_WEB3_HTTP_PROVIDERS = [
-"https://ropsten.infura.io",		// Ropsten
-"https://mainnet.infura.io"			// Mainnet
+"https://ropsten.infura.io/v3/ab6d6b83d2084a7da09f78da2c958770",	// Ropsten
+"https://mainnet.infura.io/v3/ab6d6b83d2084a7da09f78da2c958770"		// Mainnet
 ];
 
 // Initialize variables
