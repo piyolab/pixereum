@@ -54,6 +54,7 @@ a:hover {
 #info_panel {
 	display: table-cell;
 	vertical-align: middle;
+	width: 242px;
 }
 
 #links {

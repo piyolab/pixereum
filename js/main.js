@@ -117,33 +117,29 @@ function initSettings() {
 
 
 function initWeb3(){
-  if (window.ethereum) {
-    console.log('Using Browser provider!');
-    window.web3 = new Web3(window.ethereum);
-    window.ethereum.enable();
-    pixereum.isMetaMask = true;
-  } else {
-    console.log('Using HTTP provider!')
-    window.web3 = new Web3(new Web3.providers.HttpProvider(pixereum.httpProvider));
-  }
+	if (window.ethereum) {
+	    window.web3 = new Web3(window.ethereum)
+	} else {
+		window.web3 = new Web3(new Web3.providers.HttpProvider(pixereum.httpProvider))		
+	}
 }
 
 
 function initContract() {
 	var address = CONTRACT_ADDRESS[1];
 	if (!isMainnet) address = CONTRACT_ADDRESS[0];
-	pixereum.contract = window.web3.eth.contract(CONTRACT_ABI).at(pixereum.address);
+	pixereum.contract = new window.web3.eth.Contract(CONTRACT_ABI, pixereum.address);
 }
 
 
 function getPixels(callback) {
-	pixereum.contract.getColors(function(error, result){
+	pixereum.contract.methods.getColors().call(function(error, result){
 		if(!error) {
         	console.log(result);
         	$.each(pixereum.pixels, function(xIndex, xVal){
 				$.each(pixereum.pixels[xIndex], function(yIndex, Val){
 					var pixelNumber = getPixelNumber(xIndex, yIndex);
-					var intColor = parseInt(result[pixelNumber]["c"]);
+					var intColor = parseInt(result[pixelNumber]);
 					var hexColorString = getHexColorString(intColor);
 					fillPixel(context, xIndex, yIndex, hexColorString);
 					pixereum.pixels[xIndex][yIndex]= {pixelNumber: pixelNumber, intColor: intColor, color: hexColorString};
@@ -219,14 +215,12 @@ function registerPixelBuyButton() {
 		console.log(inputs);
 		var intColor = getIntColor(inputs.color);
 		var pixelNumber = getPixelNumber(inputs.x, inputs.y);
-		var weiValue = web3.toWei(inputs.price, "ether");
+		var weiValue = web3.utils.toWei(inputs.price, "ether");
 
-		pixereum.contract.buyPixel(inputs.owner,
-									pixelNumber,
-									intColor,
-									inputs.message,
-								   {value:weiValue},
-								   function(error, result) {
+		pixereum.contract.methods
+		.buyPixel(inputs.owner, pixelNumber, intColor, inputs.message)
+		.send({value:weiValue, from: ethereum.selectedAddress}, function(error, result) {
+			console.log(error);
 			console.log(result);
 			if (result) {
 				showTransactionResult(result);
@@ -269,7 +263,9 @@ function registerUpdateButtons() {
 	$('#update_owner').click(function(e) {
 		var pixelNumber = $('#pixel_number').val();
 		var address = $('#update_owner_input').val();
-		pixereum.contract.setOwner(pixelNumber, address, (err, res) => {
+		pixereum.contract.methods
+		.setOwner(pixelNumber, address)
+		.send({from: ethereum.selectedAddress}, (err, res) => {
 			if (res) showTransactionResult(res);
 		});
 	});
@@ -278,7 +274,9 @@ function registerUpdateButtons() {
 		var pixelNumber = $('#pixel_number').val();
 		var colorCode = $('#update_color_input').val();
 		var intColor = getIntColor(colorCode);
-		pixereum.contract.setColor(pixelNumber, intColor, (err, res) => {
+		pixereum.contract.methods
+		.setColor(pixelNumber, intColor)
+		.send({from: ethereum.selectedAddress}, (err, res) => {
 			if (res) showTransactionResult(res);
 		});
 	});
@@ -286,7 +284,9 @@ function registerUpdateButtons() {
 	$('#update_message').click(function(e) {
 		var pixelNumber = $('#pixel_number').val();
 		var message = $('#update_message_input').val();
-		pixereum.contract.setMessage(pixelNumber, message, (err, res) => {
+		pixereum.contract.methods
+		.setMessage(pixelNumber, message)
+		.send({from: ethereum.selectedAddress}, (err, res) => {
 			if (res) showTransactionResult(res);
 		});
 	});
@@ -298,8 +298,10 @@ function registerUpdateButtons() {
 			alert("Error. Price should be more than 0");
 			return;
 		}
-		var weiValue = web3.toWei(price, "ether");
-		pixereum.contract.setPrice(pixelNumber, weiValue, (err, res) => {
+		var weiValue = web3.utils.toWei(price, "ether");
+		pixereum.contract.methods
+		.setPrice(pixelNumber, weiValue)
+		.send({from: ethereum.selectedAddress}, (err, res) => {
 			if (res) showTransactionResult(res);
 		});
 	});
@@ -307,7 +309,9 @@ function registerUpdateButtons() {
 	$('#update_sale').click(function(e) {
 		var pixelNumber = $('#pixel_number').val();
 		var isSale = $('input[name=isSale]:eq(0)').prop('checked');
-		pixereum.contract.setSaleState(pixelNumber, isSale,	(err, res) => {
+		pixereum.contract.methods
+		.setSaleState(pixelNumber, isSale)
+		.send({from: ethereum.selectedAddress}, (err, res) => {
 			if (res) showTransactionResult(res);
 		});
 	});
@@ -315,8 +319,10 @@ function registerUpdateButtons() {
 
 
 function refreshUpdatePixelSection(pixelData) {
-	if(pixereum.isMetaMask != true) return;
-	if(pixelData.owner != window.web3.eth.accounts[0]) return;
+	console.log("refreshUpdatePixelSection")
+	// show update section only when pixel owner's wallet is connected
+	if(pixelData.owner.toLowerCase() != ethereum.selectedAddress.toLowerCase()) return;
+	
 	console.log("pixelData", pixelData);
 	$('#get_pixel').hide();
 	$('#update_color_input').val('#'+pixelData.color);
@@ -347,18 +353,19 @@ function hideSections() {
 }
 
 function hideDetails() {
-	if(pixereum.isMetaMask == true) {
-		$('#pixel_buy_button_direct').hide();
-	} else {
-		$(".metamask").map(function(){
-    		return $(this).hide();
-		});
-	}
+	$('#pixel_buy_button_direct').hide();
+	// if(pixereum.isMetaMask == true) {
+	// 	$('#pixel_buy_button_direct').hide();
+	// } else {
+	// 	$(".metamask").map(function(){
+ //    		return $(this).hide();
+	// 	});
+	// }
 }
 
 
 function getPixelData(x, y, callback) {
-	pixereum.contract.getPixel(getPixelNumber(x, y), function(error, result){
+	pixereum.contract.methods.getPixel(getPixelNumber(x, y)).call(function(error, result){
 		if(!error) {
         	console.log(result);
         	var pixelData = {};
@@ -371,7 +378,7 @@ function getPixelData(x, y, callback) {
 			pixelData.intColor = pixereum.pixels[x][y].intColor;
 			pixelData.owner = result[0];
 			pixelData.message = result[1];
-			pixelData.ethPrice = result[2]["c"][0]/10000;
+			pixelData.ethPrice = web3.utils.fromWei(result[2]);
 			pixelData.isSale = result[3];
         	callback(pixelData);
     	} else {
@@ -385,7 +392,7 @@ function getPixelData(x, y, callback) {
 
 
 function registerCanvasClick() {
-	canvas.on('click', function(e) {
+	canvas.on('click', async function(e) {
 
 		hideSections();
 
@@ -399,14 +406,25 @@ function registerCanvasClick() {
 
 	    $('#modal_pixel_detail').iziModal('open');
 	    $('#modal_pixel_detail').iziModal('startLoading');
+
 		$('#pixel_detail_x').text(x);
 		$('#pixel_detail_y').text(y);
 		$('#pixel_x').val(x);
 		$('#pixel_y').val(y);
 		$('#pixel_number').val(pixelNumber);
 
+		const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
+		.catch((error) => {
+			console.log(error)
+		})
+		console.log("accounts: ", accounts)
+
+		if (accounts[0]) {
+			pixereum.isMetaMask = true
+		}
+
 		if (pixereum.isMetaMask) {
-			$('#pixel_buy_owner').val(window.web3.eth.accounts[0]);			
+			$('#pixel_buy_owner').val(accounts[0]);			
 		}
 
 		getPixelData(x, y, (pixelData) => {
