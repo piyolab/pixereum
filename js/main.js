@@ -321,6 +321,7 @@ function registerUpdateButtons() {
 function refreshUpdatePixelSection(pixelData) {
 	console.log("refreshUpdatePixelSection")
 	// show update section only when pixel owner's wallet is connected
+	if(!ethereum || !ethereum.selectedAddress) return;
 	if(pixelData.owner.toLowerCase() != ethereum.selectedAddress.toLowerCase()) return;
 	
 	console.log("pixelData", pixelData);
@@ -418,13 +419,10 @@ function registerCanvasClick() {
 			console.log(error)
 		})
 		console.log("accounts: ", accounts)
+		console.log("ethereum.selectedAddress: ", ethereum.selectedAddress)
 
-		if (accounts[0]) {
-			pixereum.isMetaMask = true
-		}
-
-		if (pixereum.isMetaMask) {
-			$('#pixel_buy_owner').val(accounts[0]);			
+		if (ethereum.selectedAddress) {
+			$('#pixel_buy_owner').val(ethereum.selectedAddress);
 		}
 
 		getPixelData(x, y, (pixelData) => {
