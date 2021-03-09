@@ -23,6 +23,10 @@ a:hover {
 	color: #000000; 
 }
 
+a.title_link:link {
+	text-decoration: none;
+}
+
 #container {
 	margin: 0 auto;
 	width: 1000px;
@@ -39,6 +43,7 @@ a:hover {
 	height: 60px;
 	display: table;
 }
+
 
 #title {
 	display: table-cell;
