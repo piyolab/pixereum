@@ -333,7 +333,7 @@ function initApp() {
 		hideDetails();
 		registerUpdateButtons();
 		const pixelNumber = getUrlParam('p')
-		if (pixelNumber >= 0 && pixelNumber < 10000) {
+		if (pixelNumber && pixelNumber >= 0 && pixelNumber < 10000) {
 			const [x, y] = getCoordinate(pixelNumber)
 			showPixelDetail(x, y)
 		}
