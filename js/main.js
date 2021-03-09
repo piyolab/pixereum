@@ -56,7 +56,7 @@ var context = canvas[0].getContext('2d')
 
 
 // **************************************
-// Functions
+// Util Functions
 // **************************************
 
 function getPixelNumber(x, y) {
@@ -357,14 +357,6 @@ function resetField(message, color) {
 	$('#pixel_buy_color').val("#" + color);
 }
 
-
-function hideSections() {
-	$('#get_pixel').hide();
-	$('#get_pixel_direct').hide();
-	$('#transaction_result').hide();
-	$('#update_pixel_section').hide();
-}
-
 function hideDetails() {
 	$('#pixel_buy_button_direct').hide();
 	// if(pixereum.isMetaMask == true) {
@@ -401,64 +393,6 @@ function getPixelData(x, y, callback) {
 }
 
 
-
-
-
-function registerCanvasClick() {
-	canvas.on('click', async function(e) {
-
-		hideSections();
-
-		var p = getMousePosition(e);
-		var x = p.x;
-		var y = p.y;
-		console.log("x:", x, "y:", y);
-		var pixelNumber = getPixelNumber(x, y);
-		console.log(pixelNumber);
-		e.preventDefault();
-
-	    $('#modal_pixel_detail').iziModal('open');
-	    $('#modal_pixel_detail').iziModal('startLoading');
-
-		$('#pixel_x').val(x);
-		$('#pixel_y').val(y);
-		$('#pixel_number').val(pixelNumber);
-
-		const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
-		.catch((error) => {
-			console.log(error)
-		})
-		console.log("accounts: ", accounts)
-		console.log("ethereum.selectedAddress: ", ethereum.selectedAddress)
-
-		if (ethereum.selectedAddress) {
-			$('#pixel_buy_owner').val(ethereum.selectedAddress);
-		}
-
-		getPixelData(x, y, (pixelData) => {
-			$('#pixel_detail_x').text(x);
-			$('#pixel_detail_y').text(y);
-			$('#pixel_detail_number').text(pixelData.pixelNumber)
-			$('#pixel_detail_color_hex').text(pixelData.color);
-			$('#pixel_detail_owner').text(pixelData.owner);
-			$('#pixel_detail_message').text(pixelData.message);
-			$('#pixel_detail_message').addAutoLink();
-			resetField(pixelData.message, pixelData.color);
-			$('#pixel_sale_status').val(pixelData.isSale);
-			if (pixelData.isSale) {
-				$('#pixel_detail_sale_status').text("for sale");
-			} else {
-				$('#pixel_detail_sale_status').text("not for sale");
-			}
-			$('#pixel_detail_price').text(pixelData.ethPrice);
-			$('#pixel_price').val(pixelData.ethPrice);
-			$('#get_pixel').show();
-			refreshUpdatePixelSection(pixelData);
-		    $('#modal_pixel_detail').iziModal('stopLoading');
-		});
-
-	});
-}
 
 
 function registerMouseMove() {
@@ -547,3 +481,83 @@ function initApp() {
 window.addEventListener('load', function() {
 	initApp();
 });
+
+// **************************************
+// View-related Functions
+// **************************************
+
+function hideSections() {
+	$('#get_pixel').hide()
+	$('#get_pixel_direct').hide()
+	$('#transaction_result').hide()
+	$('#update_pixel_section').hide()
+}
+
+function updatePixelModal(pixelData) {
+	$('#pixel_x').val(pixelData.x)
+	$('#pixel_y').val(pixelData.y)
+	$('#pixel_number').val(pixelData.pixelNumber)
+	$('#pixel_detail_x').text(x)
+	$('#pixel_detail_y').text(y)
+	$('#pixel_detail_number').text(pixelData.pixelNumber)
+	$('#pixel_detail_color_hex').text(pixelData.color)
+	$('#pixel_detail_owner').text(pixelData.owner)
+	$('#pixel_detail_message').text(pixelData.message)
+	$('#pixel_detail_message').addAutoLink()
+	resetField(pixelData.message, pixelData.color)
+	$('#pixel_sale_status').val(pixelData.isSale)
+	if (pixelData.isSale) {
+		$('#pixel_detail_sale_status').text("for sale");
+	} else {
+		$('#pixel_detail_sale_status').text("not for sale");
+	}
+	$('#pixel_detail_price').text(pixelData.ethPrice)
+	$('#pixel_price').val(pixelData.ethPrice)
+	$('#get_pixel').show()
+	refreshUpdatePixelSection(pixelData)
+  $('#modal_pixel_detail').iziModal('stopLoading')
+}
+
+// **************************************
+// User Interactions
+// **************************************
+
+function getCurrentMousePosition() {
+	const p = getMousePosition(e)
+	return [p.x, p.y]
+}
+
+// Called when a pixel is clicked
+function registerCanvasClick() {
+	canvas.on('click', async function(e) {
+
+		hideSections();
+		
+		const [x, y] = getCurrentMousePosition()
+		console.log("x:", x, "y:", y)
+
+		var pixelNumber = getPixelNumber(x, y)
+		console.log(pixelNumber)
+
+		e.preventDefault()
+
+		$('#modal_pixel_detail').iziModal('open')
+		$('#modal_pixel_detail').iziModal('startLoading')
+
+		const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
+		.catch((error) => {
+			console.log(error)
+		})
+		console.log("accounts: ", accounts)
+		console.log("ethereum.selectedAddress: ", ethereum.selectedAddress)
+
+		if (ethereum.selectedAddress) {
+			$('#pixel_buy_owner').val(ethereum.selectedAddress);
+		}
+
+		getPixelData(x, y, (pixelData) => {
+			updatePixelModal(pixelData)
+		})
+
+	})
+}
