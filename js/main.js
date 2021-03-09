@@ -1,38 +1,41 @@
-var isMainnet = true;
+// **************************************
+// Global Constants & Variables
+// **************************************
 
-var pixereum = {};								// store global variables
-
-var SIZE = 100;									// number of columns (rows)
-var PIXEL_SIZE = 10 * 2;							// pixel width (height)
-
-var width = $(window).width()
-if(width < 800) {
-	PIXEL_SIZE = width/100 * 2;
+const SIZE = 100															// number of columns (rows)
+const WINDOW_WIDTH = $(window).width()
+var pixelSize = 10 * 2												// pixel width (height)
+if(WINDOW_WIDTH < 800) {
+	pixelSize = WINDOW_WIDTH/100 * 2
 }
-
-var CONTRACT_ADDRESS = [
+const canvasSize = SIZE * pixelSize						// canvas width (height)
+const numPixels = SIZE * pixelSize						// number of pixels
+var isMainnet = true
+var pixereum = {}															// store global variables
+const CONTRACT_ADDRESS = [
 "0xBFC28Cd8b0F3AdBF0686DBF97dE4212eFf5A42b9",	// Ropsten
 "0xc0d72D45CcA854e0F2fE3Cd2D4BAb91E772fE4C0"	// Mainnet
-];
+]
 
-var CONTRACT_ABI = 
+const CONTRACT_ABI = 
 [{"constant":true,"inputs":[],"name":"feeRate","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"width","outputs":[{"name":"","type":"uint16"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"colors","outputs":[{"name":"","type":"uint24"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getColors","outputs":[{"name":"","type":"uint24[10000]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_pixelNumber","type":"uint16"}],"name":"getPixel","outputs":[{"name":"","type":"address"},{"name":"","type":"string"},{"name":"","type":"uint256"},{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"isMessageEnabled","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"numberOfPixels","outputs":[{"name":"","type":"uint16"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_color","type":"uint24"}],"name":"setColor","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"beneficiary","type":"address"},{"name":"_pixelNumber","type":"uint16"},{"name":"_color","type":"uint24"},{"name":"_message","type":"string"}],"name":"buyPixel","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_isSale","type":"bool"}],"name":"setSaleState","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"}],"name":"deleteMessage","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_weiAmount","type":"uint256"}],"name":"setPrice","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_owner","type":"address"}],"name":"setOwner","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_isMesssageEnabled","type":"bool"}],"name":"setMessageStatus","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_message","type":"string"}],"name":"setMessage","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"payable":true,"stateMutability":"payable","type":"fallback"}]
-;
 
-var DEFAULT_WEB3_HTTP_PROVIDERS = [
+
+const DEFAULT_WEB3_HTTP_PROVIDERS = [
 "https://ropsten.infura.io/v3/ab6d6b83d2084a7da09f78da2c958770",	// Ropsten
 "https://mainnet.infura.io/v3/ab6d6b83d2084a7da09f78da2c958770"		// Mainnet
-];
+]
 
-// Initialize variables
-var canvasSize = SIZE * PIXEL_SIZE;				// canvas width (height)
-var numPixels = SIZE * SIZE;					// number of pixels
 
-// Initialize pixels
-pixereum.pixels = Array(SIZE);
-$.each(pixereum.pixels, function(index, val){
-	pixereum.pixels[index] = Array(SIZE);
-});
+// **************************************
+// Initialize Pixel Canvas
+// **************************************
+
+// initalize pixels
+pixereum.pixels = Array(SIZE)
+$.each(pixereum.pixels, (index, val)=> {
+	pixereum.pixels[index] = Array(SIZE)
+})
 
 // create canvas
 var canvas = $('<canvas>').attr({
@@ -41,11 +44,20 @@ var canvas = $('<canvas>').attr({
   id: "canvas"
 })
 
-canvas.css({'width':canvasSize/2, 'height':canvasSize/2, 'background-color':'#000000'});
+canvas.css({
+	'width':canvasSize/2, 
+	'height':canvasSize/2,
+	'background-color':'#000000'
+})
 
 // add canvas
-$('#main_box').append(canvas);
-var context = canvas[0].getContext('2d');
+$('#main_box').append(canvas)
+var context = canvas[0].getContext('2d')
+
+
+// **************************************
+// Util Functions
+// **************************************
 
 function getPixelNumber(x, y) {
 	return x + y * SIZE;
@@ -71,7 +83,7 @@ function getHexColorString(val) {
 
 function fillPixel(context, x, y, color) {
 	context.fillStyle = '#' + color;
-	context.fillRect(x*PIXEL_SIZE, y*PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
+	context.fillRect(x*pixelSize, y*pixelSize, pixelSize, pixelSize);
 }
 
 function addGrid(canvas, context){
@@ -80,8 +92,8 @@ function addGrid(canvas, context){
 	context.lineWidth = 0.4;
 	context.lineWidth = 0.3;
 	for(i = 0; i < SIZE+1; i++) {
-		step = (i * PIXEL_SIZE);
-		if (width < 800) step = step + 0.2
+		step = (i * pixelSize);
+		if (WINDOW_WIDTH < 800) step = step + 0.2
 		context.moveTo(step, 0);
 		context.lineTo(step, canvasSize);
 		context.moveTo(0, step);
@@ -92,8 +104,8 @@ function addGrid(canvas, context){
 
 function getMousePosition(e) {
 	var rect = e.target.getBoundingClientRect();
-	var x = e.clientX - rect.left <= 0 ? 0 : Math.floor((e.clientX - rect.left) / PIXEL_SIZE * 2);
-	var y = e.clientY - rect.top <= 0 ? 0 : Math.floor((e.clientY - (rect.top+0.01)) / PIXEL_SIZE * 2);
+	var x = e.clientX - rect.left <= 0 ? 0 : Math.floor((e.clientX - rect.left) / pixelSize * 2);
+	var y = e.clientY - rect.top <= 0 ? 0 : Math.floor((e.clientY - (rect.top+0.01)) / pixelSize * 2);
 	return {x:x, y:y};
 }
 
@@ -118,7 +130,7 @@ function initSettings() {
 
 function initWeb3(){
 	if (window.ethereum) {
-	    window.web3 = new Web3(window.ethereum)
+	  window.web3 = new Web3(window.ethereum)
 	} else {
 		window.web3 = new Web3(new Web3.providers.HttpProvider(pixereum.httpProvider))		
 	}
@@ -258,69 +270,10 @@ function registerDirectPixelBuyButton() {
 }
 
 
-function registerUpdateButtons() {
-	
-	$('#update_owner').click(function(e) {
-		var pixelNumber = $('#pixel_number').val();
-		var address = $('#update_owner_input').val();
-		pixereum.contract.methods
-		.setOwner(pixelNumber, address)
-		.send({from: ethereum.selectedAddress}, (err, res) => {
-			if (res) showTransactionResult(res);
-		});
-	});
-
-	$('#update_color').click(function(e) {
-		var pixelNumber = $('#pixel_number').val();
-		var colorCode = $('#update_color_input').val();
-		var intColor = getIntColor(colorCode);
-		pixereum.contract.methods
-		.setColor(pixelNumber, intColor)
-		.send({from: ethereum.selectedAddress}, (err, res) => {
-			if (res) showTransactionResult(res);
-		});
-	});
-
-	$('#update_message').click(function(e) {
-		var pixelNumber = $('#pixel_number').val();
-		var message = $('#update_message_input').val();
-		pixereum.contract.methods
-		.setMessage(pixelNumber, message)
-		.send({from: ethereum.selectedAddress}, (err, res) => {
-			if (res) showTransactionResult(res);
-		});
-	});
-
-	$('#update_price').click(function(e) {
-		var pixelNumber = $('#pixel_number').val();
-		var price = $('#update_price_input').val();
-		if (price <= 0) {
-			alert("Error. Price should be more than 0");
-			return;
-		}
-		var weiValue = web3.utils.toWei(price, "ether");
-		pixereum.contract.methods
-		.setPrice(pixelNumber, weiValue)
-		.send({from: ethereum.selectedAddress}, (err, res) => {
-			if (res) showTransactionResult(res);
-		});
-	});
-
-	$('#update_sale').click(function(e) {
-		var pixelNumber = $('#pixel_number').val();
-		var isSale = $('input[name=isSale]:eq(0)').prop('checked');
-		pixereum.contract.methods
-		.setSaleState(pixelNumber, isSale)
-		.send({from: ethereum.selectedAddress}, (err, res) => {
-			if (res) showTransactionResult(res);
-		});
-	});
-}
-
-
 function refreshUpdatePixelSection(pixelData) {
 	console.log("refreshUpdatePixelSection")
 	// show update section only when pixel owner's wallet is connected
+	if(!ethereum || !ethereum.selectedAddress) return;
 	if(pixelData.owner.toLowerCase() != ethereum.selectedAddress.toLowerCase()) return;
 	
 	console.log("pixelData", pixelData);
@@ -342,14 +295,6 @@ function resetField(message, color) {
 	$('#pixel_buy_message').val(message);
 	$('#pixel_color_picker').val("#" + color);
 	$('#pixel_buy_color').val("#" + color);
-}
-
-
-function hideSections() {
-	$('#get_pixel').hide();
-	$('#get_pixel_direct').hide();
-	$('#transaction_result').hide();
-	$('#update_pixel_section').hide();
 }
 
 function hideDetails() {
@@ -386,108 +331,6 @@ function getPixelData(x, y, callback) {
     	}
 	});
 }
-
-
-
-
-
-function registerCanvasClick() {
-	canvas.on('click', async function(e) {
-
-		hideSections();
-
-		var p = getMousePosition(e);
-		var x = p.x;
-		var y = p.y;
-		console.log("x:", x, "y:", y);
-		var pixelNumber = getPixelNumber(x, y);
-		console.log(pixelNumber);
-		e.preventDefault();
-
-	    $('#modal_pixel_detail').iziModal('open');
-	    $('#modal_pixel_detail').iziModal('startLoading');
-
-		$('#pixel_detail_x').text(x);
-		$('#pixel_detail_y').text(y);
-		$('#pixel_x').val(x);
-		$('#pixel_y').val(y);
-		$('#pixel_number').val(pixelNumber);
-
-		const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
-		.catch((error) => {
-			console.log(error)
-		})
-		console.log("accounts: ", accounts)
-
-		if (accounts[0]) {
-			pixereum.isMetaMask = true
-		}
-
-		if (pixereum.isMetaMask) {
-			$('#pixel_buy_owner').val(accounts[0]);			
-		}
-
-		getPixelData(x, y, (pixelData) => {
-			$('#pixel_detail_x_hex').text(pixelData.hexX);
-			$('#pixel_detail_y_hex').text(pixelData.hexY);
-			$('#pixel_detail_number').text(pixelData.pixelNumber)
-			$('#pixel_detail_color_hex').text(pixelData.color);
-			$('#pixel_detail_color_int').text(pixelData.intColor);
-			$('#pixel_detail_owner').text(pixelData.owner);
-			$('#pixel_detail_message').text(pixelData.message);
-			$('#pixel_detail_message').addAutoLink();
-			resetField(pixelData.message, pixelData.color);
-			$('#pixel_sale_status').val(pixelData.isSale);
-			if (pixelData.isSale) {
-				$('#pixel_detail_sale_status').text("for sale");
-			} else {
-				$('#pixel_detail_sale_status').text("not for sale");
-			}
-			$('#pixel_detail_price').text(pixelData.ethPrice);
-			$('#pixel_price').val(pixelData.ethPrice);
-			$('#get_pixel').show();
-			refreshUpdatePixelSection(pixelData);
-		    $('#modal_pixel_detail').iziModal('stopLoading');
-		});
-
-	});
-}
-
-
-function registerMouseMove() {
-	canvas.on('mousemove', function(e) {
-		var p = getMousePosition(e);
-		// console.log("x:", p.x, "y:", p.y);
-		$('#info_pixel_x').text(p.x);
-		$('#info_pixel_y').text(p.y);
-		$('#info_pixel_number').text(getPixelNumber(p.x, p.y));
-	});
-}
-
-
-function registerColorPicker() {
-	$('#pixel_color_picker').on("change", function(){
-		var colorHex = $('#pixel_color_picker').val();
-		$('#pixel_buy_color').val(colorHex);
-	});
-	$('#pixel_buy_color').on("change", function(){
-		var colorHex = $('#pixel_buy_color').val();
-		$('#pixel_color_picker').val(colorHex);
-	});
-}
-
-function registerUpdateColorPicker() {
-	$('#update_color_picker').on("change", function(){
-		var colorHex = $('#update_color_picker').val();
-		$('#update_color_input').val(colorHex);
-	});
-	$('#update_color_input').on("change", function(){
-		var colorHex = $('#update_color_input').val();
-		$('#update_color_picker').val(colorHex);
-	});
-}
-
-
 
 function getUrlParam(key) {
     key = key.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
@@ -537,6 +380,232 @@ function initApp() {
 	});
 }
 
+
+
+// **************************************
+// Wallet-related Functions
+// **************************************
+
+function isWalletConnected() {
+	if (!window.ethereum || !window.ethereum.selectedAddress) {
+		return false
+	}
+	return true
+}
+
+ethereum.on('connect', (connectInfo) => {
+	console.log("Connected to a wallet")
+	console.log(connectInfo)
+	// => {chainId: "0x3"}
+	console.log(isWalletConnected())
+})
+
+// Called when account is changed / permitted
+ethereum.on('accountsChanged', (accounts) => {
+	console.log("Wallet account is changed")
+	updateWalletButtonViewability()
+})
+
+ethereum.on('disconnect', (error) => {
+	console.log("Disconnected from a wallet")
+})
+
+// **************************************
+// View-related Functions
+// **************************************
+
+function updateWalletButtonViewability() {
+	if(isWalletConnected()) {
+		$('#wallet_button').hide()
+		$('#connection_status').text(`wallet connected: ${window.ethereum.selectedAddress.slice(0, 8)}...`)
+	} else {
+		$('#wallet_button').show()
+		$('#connection_status').text("wallet disconnected")
+	}
+}
+
+function hideSections() {
+	$('#get_pixel').hide()
+	$('#get_pixel_direct').hide()
+	$('#transaction_result').hide()
+	$('#update_pixel_section').hide()
+}
+
+function updatePixelModal(pixelData) {
+	$('#pixel_x').val(pixelData.x)
+	$('#pixel_y').val(pixelData.y)
+	$('#pixel_number').val(pixelData.pixelNumber)
+	$('#pixel_detail_x').text(pixelData.x)
+	$('#pixel_detail_y').text(pixelData.y)
+	$('#pixel_detail_number').text(pixelData.pixelNumber)
+	$('#pixel_detail_color_hex').text(pixelData.color)
+	$('#pixel_detail_owner').text(pixelData.owner)
+	$('#pixel_detail_message').text(pixelData.message)
+	$('#pixel_detail_message').addAutoLink()
+	$('#pixel_sale_status').val(pixelData.isSale)
+	if (pixelData.isSale) {
+		$('#pixel_detail_sale_status').text("for sale")
+	} else {
+		$('#pixel_detail_sale_status').text("not for sale")
+	}
+	$('#pixel_detail_price').text(pixelData.ethPrice)
+	$('#pixel_price').val(pixelData.ethPrice)
+	
+	resetField(pixelData.message, pixelData.color)
+	if (isWalletConnected()) {
+		$('#pixel_buy_owner').val(window.ethereum.selectedAddress)
+	}
+
+	$('#get_pixel').show()
+	refreshUpdatePixelSection(pixelData)
+}
+
+function updateInfoPanel(e) {
+	const [x, y] = getCurrentMousePosition(e)
+	$('#info_pixel_x').text(x)
+	$('#info_pixel_y').text(y)
+	$('#info_pixel_number').text(getPixelNumber(x, y))
+}
+
+// **************************************
+// User Interactions
+// **************************************
+
+function registerMouseMove() {
+	canvas.on('mousemove', function(e) {
+		updateInfoPanel(e)
+	})
+}
+
+function getCurrentMousePosition(e) {
+	const p = getMousePosition(e)
+	return [p.x, p.y]
+}
+
+// Called when "Connect to a wallet" button is clicked
+async function onConnectWalletButtonClick() {
+	const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
+	.catch((error) => {
+		console.log(error)
+	})
+	updateWalletButtonViewability()
+}
+
+// Called when a pixel is clicked
+function registerCanvasClick() {
+	canvas.on('click', async function(e) {
+
+		hideSections();
+		
+		const [x, y] = getCurrentMousePosition(e)
+		console.log("x:", x, "y:", y)
+
+		var pixelNumber = getPixelNumber(x, y)
+		console.log(pixelNumber)
+
+		e.preventDefault()
+
+		$('#modal_pixel_detail').iziModal('open')
+		$('#modal_pixel_detail').iziModal('startLoading')
+
+		getPixelData(x, y, (pixelData) => {
+			updatePixelModal(pixelData)
+			$('#modal_pixel_detail').iziModal('stopLoading')
+		})
+
+	})
+}
+
+function registerUpdateButtons() {
+	
+	// Called when update owner button is clicked
+	$('#update_owner').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
+		var address = $('#update_owner_input').val();
+		pixereum.contract.methods
+		.setOwner(pixelNumber, address)
+		.send({from: ethereum.selectedAddress}, (err, res) => {
+			if (res) showTransactionResult(res);
+		});
+	});
+
+	// Called when update color button is clicked
+	$('#update_color').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
+		var colorCode = $('#update_color_input').val();
+		var intColor = getIntColor(colorCode);
+		pixereum.contract.methods
+		.setColor(pixelNumber, intColor)
+		.send({from: ethereum.selectedAddress}, (err, res) => {
+			if (res) showTransactionResult(res);
+		});
+	});
+
+	// Called when update message button is clicked
+	$('#update_message').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
+		var message = $('#update_message_input').val();
+		pixereum.contract.methods
+		.setMessage(pixelNumber, message)
+		.send({from: ethereum.selectedAddress}, (err, res) => {
+			if (res) showTransactionResult(res);
+		});
+	});
+
+	// Called when update price button is clicked
+	$('#update_price').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
+		var price = $('#update_price_input').val();
+		if (price <= 0) {
+			alert("Error. Price should be more than 0");
+			return;
+		}
+		var weiValue = web3.utils.toWei(price, "ether");
+		pixereum.contract.methods
+		.setPrice(pixelNumber, weiValue)
+		.send({from: ethereum.selectedAddress}, (err, res) => {
+			if (res) showTransactionResult(res);
+		});
+	});
+
+	// Called when update sale button is clicked
+	$('#update_sale').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
+		var isSale = $('input[name=isSale]:eq(0)').prop('checked');
+		pixereum.contract.methods
+		.setSaleState(pixelNumber, isSale)
+		.send({from: ethereum.selectedAddress}, (err, res) => {
+			if (res) showTransactionResult(res);
+		});
+	});
+}
+
+function registerColorPicker() {
+	$('#pixel_color_picker').on("change", function(){
+		var colorHex = $('#pixel_color_picker').val();
+		$('#pixel_buy_color').val(colorHex);
+	});
+	$('#pixel_buy_color').on("change", function(){
+		var colorHex = $('#pixel_buy_color').val();
+		$('#pixel_color_picker').val(colorHex);
+	});
+}
+
+function registerUpdateColorPicker() {
+	$('#update_color_picker').on("change", function(){
+		var colorHex = $('#update_color_picker').val();
+		$('#update_color_input').val(colorHex);
+	});
+	$('#update_color_input').on("change", function(){
+		var colorHex = $('#update_color_input').val();
+		$('#update_color_picker').val(colorHex);
+	});
+}
+
+// **************************************
+// onload
+// **************************************
+
 window.addEventListener('load', function() {
-	initApp();
-});
+	initApp()
+})

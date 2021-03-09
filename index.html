@@ -35,7 +35,13 @@
 				</p>
 			</div>
 			<div id="links">
-				<p><a href="#about" class="about_trigger">about this project</a> | <a href="https://goo.gl/hCiWyz" target="_blank">how to get a pixel</a> | <a href="https://goo.gl/SDJZMz" target="_blank">smart contract (github)</a></p>
+				<p><a href="#about" class="about_trigger">about this project</a> | <a href="https://goo.gl/hCiWyz" target="_blank">how to get a pixel</a>
+			</div>
+			<div id="connection_status">
+				wallet disconnected
+			</div>
+			<div id="wallet_button">
+				<p><button class="btn" onclick="onConnectWalletButtonClick()">Connect to a wallet</button></p>
 			</div>
 		</div>
 
@@ -99,32 +105,20 @@
 				<td><span id="pixel_detail_y"></span></td>
 			</tr>
 			<tr>
-				<td>x (hex)</td>
-				<td><span id="pixel_detail_x_hex"></span></td>
-			</tr>
-			<tr>
-				<td>y (hex)</td>
-				<td><span id="pixel_detail_y_hex"></span></td>
-			</tr>
-			<tr>
 				<td>pixel number</td>
 				<td><span id="pixel_detail_number"></span></td>
 			</tr>
 			<tr>
-				<td>color code (hex)</td>
-				<td><span id="pixel_detail_color_hex"></span></td>
-			</tr>
-			<tr>
-				<td>color code (int)</td>
-				<td><span id="pixel_detail_color_int"></span></td>
+				<td>color code</td>
+				<td>#<span id="pixel_detail_color_hex"></span></td>
 			</tr>
 			<tr>
 				<td>sale status</td>
 				<td><span id="pixel_detail_sale_status"></span></td>
 			</tr>
 			<tr>
-				<td>current price (ETH)</td>
-				<td><span id="pixel_detail_price"></span></td>
+				<td>current price</td>
+				<td><span id="pixel_detail_price"></span>ETH</td>
 			</tr>	
 		</table>
 		<div id="get_pixel">
