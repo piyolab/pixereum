@@ -130,7 +130,7 @@ function initSettings() {
 
 function initWeb3(){
 	if (window.ethereum) {
-	    window.web3 = new Web3(window.ethereum)
+	  window.web3 = new Web3(window.ethereum)
 	} else {
 		window.web3 = new Web3(new Web3.providers.HttpProvider(pixereum.httpProvider))		
 	}
@@ -478,13 +478,49 @@ function initApp() {
 	});
 }
 
-window.addEventListener('load', function() {
-	initApp();
-});
+
+
+// **************************************
+// Wallet-related Functions
+// **************************************
+
+function isWalletConnected() {
+	if (!window.ethereum || !window.ethereum.selectedAddress) {
+		return false
+	}
+	return true
+}
+
+ethereum.on('connect', (connectInfo) => {
+	console.log("Connected to a wallet")
+	console.log(connectInfo)
+	// => {chainId: "0x3"}
+	console.log(isWalletConnected())
+})
+
+// Called when account is changed / permitted
+ethereum.on('accountsChanged', (accounts) => {
+	console.log("Wallet account is changed")
+	updateWalletButtonViewability()
+})
+
+ethereum.on('disconnect', (error) => {
+	console.log("Disconnected from a wallet")
+})
 
 // **************************************
 // View-related Functions
 // **************************************
+
+function updateWalletButtonViewability() {
+	if(isWalletConnected()) {
+		$('#wallet_button').hide()
+		$('#connection_status').text(`wallet connected: ${window.ethereum.selectedAddress.slice(0, 8)}...`)
+	} else {
+		$('#wallet_button').show()
+		$('#connection_status').text("wallet disconnected")
+	}
+}
 
 function hideSections() {
 	$('#get_pixel').hide()
@@ -497,32 +533,36 @@ function updatePixelModal(pixelData) {
 	$('#pixel_x').val(pixelData.x)
 	$('#pixel_y').val(pixelData.y)
 	$('#pixel_number').val(pixelData.pixelNumber)
-	$('#pixel_detail_x').text(x)
-	$('#pixel_detail_y').text(y)
+	$('#pixel_detail_x').text(pixelData.x)
+	$('#pixel_detail_y').text(pixelData.y)
 	$('#pixel_detail_number').text(pixelData.pixelNumber)
 	$('#pixel_detail_color_hex').text(pixelData.color)
 	$('#pixel_detail_owner').text(pixelData.owner)
 	$('#pixel_detail_message').text(pixelData.message)
 	$('#pixel_detail_message').addAutoLink()
-	resetField(pixelData.message, pixelData.color)
 	$('#pixel_sale_status').val(pixelData.isSale)
 	if (pixelData.isSale) {
-		$('#pixel_detail_sale_status').text("for sale");
+		$('#pixel_detail_sale_status').text("for sale")
 	} else {
-		$('#pixel_detail_sale_status').text("not for sale");
+		$('#pixel_detail_sale_status').text("not for sale")
 	}
 	$('#pixel_detail_price').text(pixelData.ethPrice)
 	$('#pixel_price').val(pixelData.ethPrice)
+	
+	resetField(pixelData.message, pixelData.color)
+	if (isWalletConnected()) {
+		$('#pixel_buy_owner').val(window.ethereum.selectedAddress)
+	}
+
 	$('#get_pixel').show()
 	refreshUpdatePixelSection(pixelData)
-  $('#modal_pixel_detail').iziModal('stopLoading')
 }
 
 // **************************************
 // User Interactions
 // **************************************
 
-function getCurrentMousePosition() {
+function getCurrentMousePosition(e) {
 	const p = getMousePosition(e)
 	return [p.x, p.y]
 }
@@ -533,7 +573,7 @@ function registerCanvasClick() {
 
 		hideSections();
 		
-		const [x, y] = getCurrentMousePosition()
+		const [x, y] = getCurrentMousePosition(e)
 		console.log("x:", x, "y:", y)
 
 		var pixelNumber = getPixelNumber(x, y)
@@ -544,20 +584,27 @@ function registerCanvasClick() {
 		$('#modal_pixel_detail').iziModal('open')
 		$('#modal_pixel_detail').iziModal('startLoading')
 
-		const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
-		.catch((error) => {
-			console.log(error)
-		})
-		console.log("accounts: ", accounts)
-		console.log("ethereum.selectedAddress: ", ethereum.selectedAddress)
-
-		if (ethereum.selectedAddress) {
-			$('#pixel_buy_owner').val(ethereum.selectedAddress);
-		}
-
 		getPixelData(x, y, (pixelData) => {
 			updatePixelModal(pixelData)
+			$('#modal_pixel_detail').iziModal('stopLoading')
 		})
 
 	})
 }
+
+// Called when "Connect to a wallet" button is clicked
+async function onConnectWalletButtonClick() {
+	const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
+	.catch((error) => {
+		console.log(error)
+	})
+	updateWalletButtonViewability()
+}
+
+// **************************************
+// onload
+// **************************************
+
+window.addEventListener('load', function() {
+	initApp()
+})
