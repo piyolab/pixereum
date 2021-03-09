@@ -315,7 +315,7 @@ function initApp() {
 	    event.preventDefault();
 	    $('#modal_about').iziModal({
 			title: 'about this project',
-			padding: 100,
+			padding: 40,
 			width: 800,
 			closeButton: true	
 		});
