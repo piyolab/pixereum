@@ -270,66 +270,6 @@ function registerDirectPixelBuyButton() {
 }
 
 
-function registerUpdateButtons() {
-	
-	$('#update_owner').click(function(e) {
-		var pixelNumber = $('#pixel_number').val();
-		var address = $('#update_owner_input').val();
-		pixereum.contract.methods
-		.setOwner(pixelNumber, address)
-		.send({from: ethereum.selectedAddress}, (err, res) => {
-			if (res) showTransactionResult(res);
-		});
-	});
-
-	$('#update_color').click(function(e) {
-		var pixelNumber = $('#pixel_number').val();
-		var colorCode = $('#update_color_input').val();
-		var intColor = getIntColor(colorCode);
-		pixereum.contract.methods
-		.setColor(pixelNumber, intColor)
-		.send({from: ethereum.selectedAddress}, (err, res) => {
-			if (res) showTransactionResult(res);
-		});
-	});
-
-	$('#update_message').click(function(e) {
-		var pixelNumber = $('#pixel_number').val();
-		var message = $('#update_message_input').val();
-		pixereum.contract.methods
-		.setMessage(pixelNumber, message)
-		.send({from: ethereum.selectedAddress}, (err, res) => {
-			if (res) showTransactionResult(res);
-		});
-	});
-
-	$('#update_price').click(function(e) {
-		var pixelNumber = $('#pixel_number').val();
-		var price = $('#update_price_input').val();
-		if (price <= 0) {
-			alert("Error. Price should be more than 0");
-			return;
-		}
-		var weiValue = web3.utils.toWei(price, "ether");
-		pixereum.contract.methods
-		.setPrice(pixelNumber, weiValue)
-		.send({from: ethereum.selectedAddress}, (err, res) => {
-			if (res) showTransactionResult(res);
-		});
-	});
-
-	$('#update_sale').click(function(e) {
-		var pixelNumber = $('#pixel_number').val();
-		var isSale = $('input[name=isSale]:eq(0)').prop('checked');
-		pixereum.contract.methods
-		.setSaleState(pixelNumber, isSale)
-		.send({from: ethereum.selectedAddress}, (err, res) => {
-			if (res) showTransactionResult(res);
-		});
-	});
-}
-
-
 function refreshUpdatePixelSection(pixelData) {
 	console.log("refreshUpdatePixelSection")
 	// show update section only when pixel owner's wallet is connected
@@ -391,44 +331,6 @@ function getPixelData(x, y, callback) {
     	}
 	});
 }
-
-
-
-
-function registerMouseMove() {
-	canvas.on('mousemove', function(e) {
-		var p = getMousePosition(e);
-		// console.log("x:", p.x, "y:", p.y);
-		$('#info_pixel_x').text(p.x);
-		$('#info_pixel_y').text(p.y);
-		$('#info_pixel_number').text(getPixelNumber(p.x, p.y));
-	});
-}
-
-
-function registerColorPicker() {
-	$('#pixel_color_picker').on("change", function(){
-		var colorHex = $('#pixel_color_picker').val();
-		$('#pixel_buy_color').val(colorHex);
-	});
-	$('#pixel_buy_color').on("change", function(){
-		var colorHex = $('#pixel_buy_color').val();
-		$('#pixel_color_picker').val(colorHex);
-	});
-}
-
-function registerUpdateColorPicker() {
-	$('#update_color_picker').on("change", function(){
-		var colorHex = $('#update_color_picker').val();
-		$('#update_color_input').val(colorHex);
-	});
-	$('#update_color_input').on("change", function(){
-		var colorHex = $('#update_color_input').val();
-		$('#update_color_picker').val(colorHex);
-	});
-}
-
-
 
 function getUrlParam(key) {
     key = key.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
@@ -558,13 +460,35 @@ function updatePixelModal(pixelData) {
 	refreshUpdatePixelSection(pixelData)
 }
 
+function updateInfoPanel(e) {
+	const [x, y] = getCurrentMousePosition(e)
+	$('#info_pixel_x').text(x)
+	$('#info_pixel_y').text(y)
+	$('#info_pixel_number').text(getPixelNumber(x, y))
+}
+
 // **************************************
 // User Interactions
 // **************************************
 
+function registerMouseMove() {
+	canvas.on('mousemove', function(e) {
+		updateInfoPanel(e)
+	})
+}
+
 function getCurrentMousePosition(e) {
 	const p = getMousePosition(e)
 	return [p.x, p.y]
+}
+
+// Called when "Connect to a wallet" button is clicked
+async function onConnectWalletButtonClick() {
+	const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
+	.catch((error) => {
+		console.log(error)
+	})
+	updateWalletButtonViewability()
 }
 
 // Called when a pixel is clicked
@@ -592,13 +516,90 @@ function registerCanvasClick() {
 	})
 }
 
-// Called when "Connect to a wallet" button is clicked
-async function onConnectWalletButtonClick() {
-	const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
-	.catch((error) => {
-		console.log(error)
-	})
-	updateWalletButtonViewability()
+function registerUpdateButtons() {
+	
+	// Called when update owner button is clicked
+	$('#update_owner').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
+		var address = $('#update_owner_input').val();
+		pixereum.contract.methods
+		.setOwner(pixelNumber, address)
+		.send({from: ethereum.selectedAddress}, (err, res) => {
+			if (res) showTransactionResult(res);
+		});
+	});
+
+	// Called when update color button is clicked
+	$('#update_color').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
+		var colorCode = $('#update_color_input').val();
+		var intColor = getIntColor(colorCode);
+		pixereum.contract.methods
+		.setColor(pixelNumber, intColor)
+		.send({from: ethereum.selectedAddress}, (err, res) => {
+			if (res) showTransactionResult(res);
+		});
+	});
+
+	// Called when update message button is clicked
+	$('#update_message').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
+		var message = $('#update_message_input').val();
+		pixereum.contract.methods
+		.setMessage(pixelNumber, message)
+		.send({from: ethereum.selectedAddress}, (err, res) => {
+			if (res) showTransactionResult(res);
+		});
+	});
+
+	// Called when update price button is clicked
+	$('#update_price').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
+		var price = $('#update_price_input').val();
+		if (price <= 0) {
+			alert("Error. Price should be more than 0");
+			return;
+		}
+		var weiValue = web3.utils.toWei(price, "ether");
+		pixereum.contract.methods
+		.setPrice(pixelNumber, weiValue)
+		.send({from: ethereum.selectedAddress}, (err, res) => {
+			if (res) showTransactionResult(res);
+		});
+	});
+
+	// Called when update sale button is clicked
+	$('#update_sale').click(function(e) {
+		var pixelNumber = $('#pixel_number').val();
+		var isSale = $('input[name=isSale]:eq(0)').prop('checked');
+		pixereum.contract.methods
+		.setSaleState(pixelNumber, isSale)
+		.send({from: ethereum.selectedAddress}, (err, res) => {
+			if (res) showTransactionResult(res);
+		});
+	});
+}
+
+function registerColorPicker() {
+	$('#pixel_color_picker').on("change", function(){
+		var colorHex = $('#pixel_color_picker').val();
+		$('#pixel_buy_color').val(colorHex);
+	});
+	$('#pixel_buy_color').on("change", function(){
+		var colorHex = $('#pixel_buy_color').val();
+		$('#pixel_color_picker').val(colorHex);
+	});
+}
+
+function registerUpdateColorPicker() {
+	$('#update_color_picker').on("change", function(){
+		var colorHex = $('#update_color_picker').val();
+		$('#update_color_input').val(colorHex);
+	});
+	$('#update_color_input').on("change", function(){
+		var colorHex = $('#update_color_input').val();
+		$('#update_color_picker').val(colorHex);
+	});
 }
 
 // **************************************
