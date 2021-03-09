@@ -165,10 +165,9 @@ function getPixels(callback) {
 }
 
 function registerModals() {
-    $('#modal_pixel_detail').iziModal({
+  $('#modal_pixel_detail').iziModal({
 		title: 'pixel details',
 		group: "detail",
-		padding: 20,
 		width: 600,
 		fullscreen: true,
 		closeButton: true	
@@ -343,21 +342,27 @@ function isWalletConnected() {
 	return true
 }
 
-ethereum.on('connect', (connectInfo) => {
-	console.log("Connected to a wallet")
-	console.log(connectInfo)
-	// => {chainId: "0x3"}
-	// console.log(isWalletConnected())
-})
+if (window.ethereum) {
+	window.ethereum.on('connect', (connectInfo) => {
+		console.log("Connected to a wallet")
+		console.log(connectInfo)
+		// => {chainId: "0x3"}
+		// console.log(isWalletConnected())
+	})
 
+	window.ethereum.request({ method: 'eth_accounts' })
+	.then(handleAccountsChanged)
+	.catch((err) => {
+	  console.error(err)
+	})
 
-ethereum.request({ method: 'eth_accounts' })
-.then(handleAccountsChanged)
-.catch((err) => {
-  console.error(err)
-})
+	window.ethereum.on('accountsChanged', handleAccountsChanged)
 
-ethereum.on('accountsChanged', handleAccountsChanged) 
+	window.ethereum.on('disconnect', (error) => {
+		console.log("Disconnected from a wallet")
+	})
+
+}
 
 // Called when account is changed / permitted
 function handleAccountsChanged(accounts) {
@@ -366,9 +371,6 @@ function handleAccountsChanged(accounts) {
 	$('#modal_pixel_detail').iziModal('close')
 }
 
-ethereum.on('disconnect', (error) => {
-	console.log("Disconnected from a wallet")
-})
 
 // **************************************
 // View-related Functions
