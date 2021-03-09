@@ -9,7 +9,7 @@ if(WINDOW_WIDTH < 800) {
 	pixelSize = WINDOW_WIDTH/100 * 2
 }
 const canvasSize = SIZE * pixelSize						// canvas width (height)
-const numPixels = SIZE * pixelSize						// number of pixels
+const numPixels = SIZE * SIZE							// number of pixels
 var isMainnet = true
 var pixereum = {}															// store global variables
 const CONTRACT_ADDRESS = [

@@ -68,34 +68,34 @@
 	<!-- Modal: About -->
 	<div id="modal_about" class="modal">
 		<h2>What's this?</h2>
-		<p>This is an experimental Ethereum based smart contract project.</p>
+		<p>This is an experimental Ethereum based art project.</p>
 		<ul>
-			<li>There's 10000 pixels (x=100, y=100) on Pixereum.</li>
+			<li>There are 10000 pixels (x=100, y=100).</li>
 			<li>Each pixel is managed on the Ethereum's blockchain by a smart contract.</li>
 			<li>Inspired by <a href="http://www.milliondollarhomepage.com/" target="_blank">http://www.milliondollarhomepage.com</a></li>
 		</ul>
 
 		<h2>What you can do?</h2>
 		<ul>
-			<li>You can be a holder of pixels by sending Ether to the smart contract.</li>
-			<li>Holders of each pixel can set any color they want.</li>
-			<li>Holders can also set any message to each pixel they own.</li>
-			<li>Holders can set any price to each pixel they own and sell it.</li>
+			<li>You can be a holder of pixels.</li>
+			<li>Holders can change the color of pixels.</li>
+			<li>Holders can set any message to pixels they own.</li>
+			<li>Holders can set any price to pixels they own and sell them.</li>
 		</ul>
 		
 		<h2>How to interact with pixels?</h2>
-		<ul>
-			<li>Try clicking each pixel.</li>
-			<li>Using <a href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn" target="_blank">MetaMask</a> is recommended.</li>
+		<ol>
+			<li>Install <a href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn" target="_blank">MetaMask</a>.</li>
+			<li>Click each pixel.</li>
 			<li>More details are <a href="https://goo.gl/hCiWyz" target="_blank">here</a>.</li>
-		</ul>
+		</ol>
 	</div>
 
 	<!-- Modal: Pixel Detail -->
 	<div id="modal_pixel_detail" class="modal">
 		<div class="modal_section">
 			<div class="modal_section_title">
-				pixel info
+				Pixel info
 			</div>
 			<div class="modal_section_body">
 				<table class="pixel_info_table">
@@ -129,7 +129,7 @@
 					</tr>
 					<tr>
 						<td>current price</td>
-						<td><span id="pixel_detail_price"></span>ETH</td>
+						<td><span id="pixel_detail_price"></span> ETH</td>
 					</tr>	
 				</table>
 			</div>
@@ -150,11 +150,11 @@
 		<!-- Modal Section: Get pixel -->
 		<div id="modal_section_get_pixel" class="modal_section">
 			<div class="modal_section_title">
-				get pixel
+				Purchase an ownership of the pixel
 			</div>
 			<div class="modal_section_body">
 				<div>
-					Owner address: <input type="text" id="pixel_buy_owner" size="50">
+					New Owner's address: <input type="text" id="pixel_buy_owner" size="50">
 				</div>
 				<div class="notice">
 					Put a new owner's wallet address.
@@ -169,11 +169,11 @@
 					Message: <input type="text" id="pixel_buy_message" size="50">
 				</div>
 				<div class="notice">
-					Be carefull. Your message will remain permanently on the blockchain.
+					Be carefull. Your message will remain permanently on the blockchain. This can be blank.
 				</div>
 				<div class="mt10 center">
 					<button id="pixel_buy_button_metamask" class="btn">
-						get this pixel with MetaMask
+						Purchase this pixel with MetaMask
 					</button>
 				</div>
 			</div>
@@ -187,7 +187,7 @@
 		<!-- Modal Section: Update pixel -->
 		<div id="modal_section_update_pixel" class="modal_section">
 			<div class="modal_section_title">
-				update pixel
+				Update pixel info
 			</div>
 			<div class="modal_section_body">
 				<table>
@@ -230,7 +230,7 @@
 			<div class="modal_section_body">
 				<div id="tx_result"></div>
 				<div class="notice">
-					Wait a few seconds - minutes and refresh this page to check updates.
+					Wait a few seconds/minutes and refresh this page later to check updates.
 				</div>
 			</div>
 		</div>
