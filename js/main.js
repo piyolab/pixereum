@@ -397,14 +397,23 @@ ethereum.on('connect', (connectInfo) => {
 	console.log("Connected to a wallet")
 	console.log(connectInfo)
 	// => {chainId: "0x3"}
-	console.log(isWalletConnected())
+	// console.log(isWalletConnected())
 })
 
+
+ethereum.request({ method: 'eth_accounts' })
+.then(handleAccountsChanged)
+.catch((err) => {
+  console.error(err)
+})
+
+ethereum.on('accountsChanged', handleAccountsChanged) 
+
 // Called when account is changed / permitted
-ethereum.on('accountsChanged', (accounts) => {
+function handleAccountsChanged(accounts) {
 	console.log("Wallet account is changed")
 	updateWalletButtonViewability()
-})
+}
 
 ethereum.on('disconnect', (error) => {
 	console.log("Disconnected from a wallet")
@@ -452,11 +461,13 @@ function updatePixelModal(pixelData) {
 	$('#pixel_price').val(pixelData.ethPrice)
 	
 	resetField(pixelData.message, pixelData.color)
+
+	updateWalletButtonViewability()
 	if (isWalletConnected()) {
 		$('#pixel_buy_owner').val(window.ethereum.selectedAddress)
+		$('#get_pixel').show()
 	}
 
-	$('#get_pixel').show()
 	refreshUpdatePixelSection(pixelData)
 }
 
