@@ -392,7 +392,7 @@ function hideSections() {
 	$('#modal_section_update_pixel').hide()
 }
 
-function updatePixelModal(pixelData) {
+function refreshPixelModal(pixelData) {
 	$('#pixel_x').val(pixelData.x)
 	$('#pixel_y').val(pixelData.y)
 	$('#pixel_number').val(pixelData.pixelNumber)
@@ -505,7 +505,7 @@ function registerCanvasClick() {
 		$('#modal_pixel_detail').iziModal('startLoading')
 
 		getPixelData(x, y, (pixelData) => {
-			updatePixelModal(pixelData)
+			refreshPixelModal(pixelData)
 			$('#modal_pixel_detail').iziModal('stopLoading')
 		})
 
