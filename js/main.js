@@ -63,6 +63,12 @@ function getPixelNumber(x, y) {
 	return x + y * SIZE;
 }
 
+function getCoordinate(pixelNumber) {
+	const x = pixelNumber % 100
+	const y = (pixelNumber - x) / 100
+	return [x, y]
+}
+
 function getIntColor(colorCode) {
 	colorCode = colorCode.slice(1);
 	r = parseInt(colorCode.substr(0,2), 16);
@@ -262,8 +268,8 @@ function hideDetails() {
 function getPixelData(x, y, callback) {
 	pixereum.contract.methods.getPixel(getPixelNumber(x, y)).call(function(error, result){
 		if(!error) {
-        	console.log(result);
-        	var pixelData = {};
+    	console.log(result);
+    	var pixelData = {};
 			pixelData.x = x;
 			pixelData.y = y;
 			pixelData.hexX = getHexCoordString(x); 
@@ -299,18 +305,6 @@ function initApp() {
 	initWeb3();
 	initContract();
 
-	getPixels(()=>{
-		addGrid(canvas, context);
-		registerModals();
-		registerCanvasClick();
-		registerMouseMove();
-		registerPixelBuyButton();
-		registerColorPicker();
-		registerUpdateColorPicker();
-		hideDetails();
-		registerUpdateButtons();
-	});
-
 	// info_panel
 	$('#info_pixel_num').text(numPixels);
 	$('#info_pixel_x').text(0);
@@ -326,6 +320,23 @@ function initApp() {
 			closeButton: true	
 		});
 	    $('#modal_about').iziModal('open');
+	});
+
+	getPixels(()=>{
+		addGrid(canvas, context);
+		registerModals();
+		registerCanvasClick();
+		registerMouseMove();
+		registerPixelBuyButton();
+		registerColorPicker();
+		registerUpdateColorPicker();
+		hideDetails();
+		registerUpdateButtons();
+		const pixelNumber = getUrlParam('p')
+		if (pixelNumber >= 0 && pixelNumber < 10000) {
+			const [x, y] = getCoordinate(pixelNumber)
+			showPixelDetail(x, y)
+		}
 	});
 }
 
@@ -395,6 +406,7 @@ function hideSections() {
 }
 
 function refreshPixelModal(pixelData) {
+	hideSections()
 	$('#pixel_x').val(pixelData.x)
 	$('#pixel_y').val(pixelData.y)
 	$('#pixel_number').val(pixelData.pixelNumber)
@@ -489,28 +501,23 @@ async function onConnectWalletButtonClick() {
 	updateWalletButtonViewability()
 }
 
+function showPixelDetail(x, y) {
+	const pixelNumber = getPixelNumber(x, y)
+	$('#modal_pixel_detail').iziModal('open')
+	$('#modal_pixel_detail').iziModal('startLoading')
+	getPixelData(x, y, (pixelData) => {
+		history.replaceState('','',`?p=${pixelData.pixelNumber}`)
+		refreshPixelModal(pixelData)
+		$('#modal_pixel_detail').iziModal('stopLoading')
+	})
+}
+
 // Called when a pixel is clicked
 function registerCanvasClick() {
 	canvas.on('click', async function(e) {
-
-		hideSections()
-		
+		e.preventDefault()		
 		const [x, y] = getCurrentMousePosition(e)
-		console.log("x:", x, "y:", y)
-
-		var pixelNumber = getPixelNumber(x, y)
-		console.log(pixelNumber)
-
-		e.preventDefault()
-
-		$('#modal_pixel_detail').iziModal('open')
-		$('#modal_pixel_detail').iziModal('startLoading')
-
-		getPixelData(x, y, (pixelData) => {
-			refreshPixelModal(pixelData)
-			$('#modal_pixel_detail').iziModal('stopLoading')
-		})
-
+		showPixelDetail(x, y)
 	})
 }
 
