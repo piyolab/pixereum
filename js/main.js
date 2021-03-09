@@ -1,38 +1,41 @@
-var isMainnet = true;
+// **************************************
+// Global Constants & Variables
+// **************************************
 
-var pixereum = {};								// store global variables
-
-var SIZE = 100;									// number of columns (rows)
-var PIXEL_SIZE = 10 * 2;							// pixel width (height)
-
-var width = $(window).width()
-if(width < 800) {
-	PIXEL_SIZE = width/100 * 2;
+const SIZE = 100															// number of columns (rows)
+const WINDOW_WIDTH = $(window).width()
+var pixelSize = 10 * 2												// pixel width (height)
+if(WINDOW_WIDTH < 800) {
+	pixelSize = WINDOW_WIDTH/100 * 2
 }
-
-var CONTRACT_ADDRESS = [
+const canvasSize = SIZE * pixelSize						// canvas width (height)
+const numPixels = SIZE * pixelSize						// number of pixels
+var isMainnet = true
+var pixereum = {}															// store global variables
+const CONTRACT_ADDRESS = [
 "0xBFC28Cd8b0F3AdBF0686DBF97dE4212eFf5A42b9",	// Ropsten
 "0xc0d72D45CcA854e0F2fE3Cd2D4BAb91E772fE4C0"	// Mainnet
-];
+]
 
-var CONTRACT_ABI = 
+const CONTRACT_ABI = 
 [{"constant":true,"inputs":[],"name":"feeRate","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"width","outputs":[{"name":"","type":"uint16"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"colors","outputs":[{"name":"","type":"uint24"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getColors","outputs":[{"name":"","type":"uint24[10000]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_pixelNumber","type":"uint16"}],"name":"getPixel","outputs":[{"name":"","type":"address"},{"name":"","type":"string"},{"name":"","type":"uint256"},{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"isMessageEnabled","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"numberOfPixels","outputs":[{"name":"","type":"uint16"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_color","type":"uint24"}],"name":"setColor","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"beneficiary","type":"address"},{"name":"_pixelNumber","type":"uint16"},{"name":"_color","type":"uint24"},{"name":"_message","type":"string"}],"name":"buyPixel","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_isSale","type":"bool"}],"name":"setSaleState","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"}],"name":"deleteMessage","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_weiAmount","type":"uint256"}],"name":"setPrice","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_owner","type":"address"}],"name":"setOwner","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_isMesssageEnabled","type":"bool"}],"name":"setMessageStatus","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"constant":false,"inputs":[{"name":"_pixelNumber","type":"uint16"},{"name":"_message","type":"string"}],"name":"setMessage","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"payable":true,"stateMutability":"payable","type":"fallback"}]
-;
 
-var DEFAULT_WEB3_HTTP_PROVIDERS = [
+
+const DEFAULT_WEB3_HTTP_PROVIDERS = [
 "https://ropsten.infura.io/v3/ab6d6b83d2084a7da09f78da2c958770",	// Ropsten
 "https://mainnet.infura.io/v3/ab6d6b83d2084a7da09f78da2c958770"		// Mainnet
-];
+]
 
-// Initialize variables
-var canvasSize = SIZE * PIXEL_SIZE;				// canvas width (height)
-var numPixels = SIZE * SIZE;					// number of pixels
 
-// Initialize pixels
-pixereum.pixels = Array(SIZE);
-$.each(pixereum.pixels, function(index, val){
-	pixereum.pixels[index] = Array(SIZE);
-});
+// **************************************
+// Initialize Pixel Canvas
+// **************************************
+
+// initalize pixels
+pixereum.pixels = Array(SIZE)
+$.each(pixereum.pixels, (index, val)=> {
+	pixereum.pixels[index] = Array(SIZE)
+})
 
 // create canvas
 var canvas = $('<canvas>').attr({
@@ -41,11 +44,20 @@ var canvas = $('<canvas>').attr({
   id: "canvas"
 })
 
-canvas.css({'width':canvasSize/2, 'height':canvasSize/2, 'background-color':'#000000'});
+canvas.css({
+	'width':canvasSize/2, 
+	'height':canvasSize/2,
+	'background-color':'#000000'
+})
 
 // add canvas
-$('#main_box').append(canvas);
-var context = canvas[0].getContext('2d');
+$('#main_box').append(canvas)
+var context = canvas[0].getContext('2d')
+
+
+// **************************************
+// Functions
+// **************************************
 
 function getPixelNumber(x, y) {
 	return x + y * SIZE;
@@ -71,7 +83,7 @@ function getHexColorString(val) {
 
 function fillPixel(context, x, y, color) {
 	context.fillStyle = '#' + color;
-	context.fillRect(x*PIXEL_SIZE, y*PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
+	context.fillRect(x*pixelSize, y*pixelSize, pixelSize, pixelSize);
 }
 
 function addGrid(canvas, context){
@@ -80,8 +92,8 @@ function addGrid(canvas, context){
 	context.lineWidth = 0.4;
 	context.lineWidth = 0.3;
 	for(i = 0; i < SIZE+1; i++) {
-		step = (i * PIXEL_SIZE);
-		if (width < 800) step = step + 0.2
+		step = (i * pixelSize);
+		if (WINDOW_WIDTH < 800) step = step + 0.2
 		context.moveTo(step, 0);
 		context.lineTo(step, canvasSize);
 		context.moveTo(0, step);
@@ -92,8 +104,8 @@ function addGrid(canvas, context){
 
 function getMousePosition(e) {
 	var rect = e.target.getBoundingClientRect();
-	var x = e.clientX - rect.left <= 0 ? 0 : Math.floor((e.clientX - rect.left) / PIXEL_SIZE * 2);
-	var y = e.clientY - rect.top <= 0 ? 0 : Math.floor((e.clientY - (rect.top+0.01)) / PIXEL_SIZE * 2);
+	var x = e.clientX - rect.left <= 0 ? 0 : Math.floor((e.clientX - rect.left) / pixelSize * 2);
+	var y = e.clientY - rect.top <= 0 ? 0 : Math.floor((e.clientY - (rect.top+0.01)) / pixelSize * 2);
 	return {x:x, y:y};
 }
 
