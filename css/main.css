@@ -1,7 +1,7 @@
 html, body, h1, p, div {
-    margin: 0;
-    padding: 0;
-    font-size: 100%;
+  margin: 0;
+  padding: 0;
+  font-size: 100%;
  	font-family: "HelveticaNeue";
 }
 
@@ -28,7 +28,7 @@ a:hover {
 	width: 1000px;
 }
 
-#menu_box {
+#navbar {
 	margin: 0px;
 	padding: 0px;
 	position: fixed;
@@ -45,7 +45,7 @@ a:hover {
 	vertical-align: middle;
 	width: 184px;
 	padding-left: 4px;
-    font-size: 200%;
+  font-size: 200%;
  	font-family: "HelveticaNeue-Thin", "Helvetica Neue Thin", "Helvetica Neue";
  	font-weight: 100;
  	letter-spacing: 3px;
@@ -74,6 +74,7 @@ a:hover {
 }
 
 .btn {
+	margin: 0;
 	border-radius: 25px;
 	background-color: #fff;
 	padding: 10px; 
@@ -105,18 +106,39 @@ a:hover {
 	display: none;
 }
 
+.center {
+	text-align: center;
+}
+
+.modal {
+	width: 100%;
+}
+
 .modal_pixel_detail_value {
 	font-style: italic;
 	color: #909090: 
 }
 
 .modal_section {
+	margin-top: 20px;
+}
+
+.modal_section_title {
+	width: 500px;
+	margin: 0 auto;
 	text-align: center;
 	font-size: 120%;
- 	font-family: "HelveticaNeue-Thin", "Helvetica Neue Thin", "Helvetica Neue";
+ 	font-family: "HelveticaNeue", "Helvetica Neue", "Helvetica Neue";
  	font-weight: 100;
  	margin-right: 60px;
  	margin-bottom: 10px;
+}
+
+.modal_section_body {
+	width: 500px;
+	margin: 0 auto;
+	margin-top: 10px;
+	margin-bottom: 20px;
 }
 
 .pixel_info_table td {
@@ -132,6 +154,14 @@ a:hover {
 	color: #ff7e79;
 	font-style: italic;
 	font-size: 80%;
+}
+
+.mt10 {
+	margin-top:10px;
+}
+
+.ml42 {
+	margin-left: 42px;
 }
 
 @media (max-width: 800px) {

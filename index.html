@@ -9,8 +9,7 @@
 	  gtag('js', new Date());
 
 	  gtag('config', 'UA-115033309-1');
-	</script>
-	
+	</script>	
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
 	<title>pixereum</title>
@@ -24,31 +23,37 @@
 
 	<div id="container">
 	
-		<div id="menu_box">
+		<!-- Navigation -->
+		<div id="navbar">
 			<h1 id="title">Pixereum</h1>
 			<div id="info_panel">
-				<p>number of pixels: <span id="info_pixel_num"></span></p>
-				<p>
+				<div>
+					number of pixels: <span id="info_pixel_num"></span>
+				</div>
+				<div>
 					x: <span id="info_pixel_x"></span>
 					y: <span id="info_pixel_y"></span>
 					number: <span id="info_pixel_number"></span>			
-				</p>
+				</div>
 			</div>
 			<div id="links">
-				<p><a href="#about" class="about_trigger">about this project</a> | <a href="https://goo.gl/hCiWyz" target="_blank">how to get a pixel</a>
+				<a href="#about" class="about_trigger">about this project</a> | <a href="https://goo.gl/hCiWyz" target="_blank">how to get a pixel</a>
 			</div>
 			<div id="connection_status">
 				wallet disconnected
 			</div>
 			<div id="wallet_button">
-				<p><button class="btn" onclick="onConnectWalletButtonClick()">Connect to a wallet</button></p>
+				<button class="btn" onclick="onConnectWalletButtonClick()">
+					Connect to a wallet
+				</button>
 			</div>
 		</div>
 
-
+		<!-- Canvas will be added -->
 		<div id="main_box">
 		</div>
 
+		<!-- Update -->
 		<h2>Updates</h2>
 		<ul id="update_list">
 			<li>Mar. 2018 - Added to <a href="https://www.stateofthedapps.com/dapps/pixereum" target="_blank">State of the ÐApps</a></li> 
@@ -60,6 +65,7 @@
 
 	</div>
 
+	<!-- Modal: About -->
 	<div id="modal_about" class="modal">
 		<h2>What's this?</h2>
 		<p>This is an experimental Ethereum based smart contract project.</p>
@@ -85,77 +91,92 @@
 		</ul>
 	</div>
 
+	<!-- Modal: Pixel Detail -->
 	<div id="modal_pixel_detail" class="modal">
-		<div class="modal_section">pixel info</div>
-		<table class="pixel_info_table">
-			<tr>
-				<td>message</td>
-				<td><span id="pixel_detail_message"></span></td>
-			</tr>
-			<tr>
-				<td>owner</td>
-				<td><span id="pixel_detail_owner"></span></td>
-			</tr>
-			<tr>
-				<td>x</td>
-				<td><span id="pixel_detail_x"></span></td>
-			</tr>
-			<tr>
-				<td>y</td>
-				<td><span id="pixel_detail_y"></span></td>
-			</tr>
-			<tr>
-				<td>pixel number</td>
-				<td><span id="pixel_detail_number"></span></td>
-			</tr>
-			<tr>
-				<td>color code</td>
-				<td>#<span id="pixel_detail_color_hex"></span></td>
-			</tr>
-			<tr>
-				<td>sale status</td>
-				<td><span id="pixel_detail_sale_status"></span></td>
-			</tr>
-			<tr>
-				<td>current price</td>
-				<td><span id="pixel_detail_price"></span>ETH</td>
-			</tr>	
-		</table>
-		<div id="get_pixel">
-			<br />
-			<div class="modal_section metamask">get pixel</div>
-			<p class="metamask">
-				Owner address: <input type="text" id="pixel_buy_owner" size="50">
-			</p>
-			<div class="notice metamask">
-				Put a new owner's wallet address.
+		<div class="modal_section">
+			<div class="modal_section_title">
+				pixel info
 			</div>
-			<br />
-			<p>
-				Color: <input type="text" id="pixel_buy_color" placeholder="#000000"><input type="color" id="pixel_color_picker" placeholder="cannot use color picker on your browser. please use left field to put hex color code." size="80">
-			</p>
-			<div class="notice">
-				Use the HEX color code format: e.g. #FFFFFF
+			<div class="modal_section_body">
+				<table class="pixel_info_table">
+					<tr>
+						<td>owner</td>
+						<td><span id="pixel_detail_owner"></span></td>
+					</tr>
+					<tr>
+						<td>x</td>
+						<td><span id="pixel_detail_x"></span></td>
+					</tr>
+					<tr>
+						<td>y</td>
+						<td><span id="pixel_detail_y"></span></td>
+					</tr>
+					<tr>
+						<td>pixel number</td>
+						<td><span id="pixel_detail_number"></span></td>
+					</tr>
+					<tr>
+						<td>color code</td>
+						<td>#<span id="pixel_detail_color_hex"></span><span id="pixel_detail_color">■</span></td>
+					</tr>
+					<tr>
+						<td>message</td>
+						<td><span id="pixel_detail_message"></span></td>
+					</tr>
+					<tr>
+						<td>sale status</td>
+						<td><span id="pixel_detail_sale_status"></span></td>
+					</tr>
+					<tr>
+						<td>current price</td>
+						<td><span id="pixel_detail_price"></span>ETH</td>
+					</tr>	
+				</table>
 			</div>
-			<br />
-			<p class="metamask">
-				Message: <input type="text" id="pixel_buy_message" size="50">
-			</p>
-			<div class="notice metamask">
-				Be carefull. Your message will remain permanently on the blockchain.
+		</div>
+
+		<!-- Modal Section: Ask to connect to a wallet -->
+		<div id="modal_section_connect_wallet" class="modal_section">
+			<div class="modal_section_title">
+				Connect to a wallet to get this pixel
 			</div>
-			<br />
-			<p class="metamask">
-				<button id="pixel_buy_button_metamask">
-					get this pixel with MetaMask
+			<div class="modal_section_body center">
+				<button class="btn" onclick="onConnectWalletButtonClick()">
+					Connect to a wallet
 				</button>
-			</p>
-			</br />
-			<p>
-				<button id="pixel_buy_button_direct">
-					get this pixel by sending Ether directly
-				</button>
-			</p>
+			</div>
+		</div>
+
+		<!-- Modal Section: Get pixel -->
+		<div id="modal_section_get_pixel" class="modal_section">
+			<div class="modal_section_title">
+				get pixel
+			</div>
+			<div class="modal_section_body">
+				<div>
+					Owner address: <input type="text" id="pixel_buy_owner" size="50">
+				</div>
+				<div class="notice">
+					Put a new owner's wallet address.
+				</div>
+				<div class="mt10">
+					Color: <input type="text" id="pixel_buy_color" placeholder="#000000"><input type="color" id="pixel_color_picker" placeholder="cannot use color picker on your browser. please use left field to put hex color code." size="80">
+				</div>
+				<div class="notice">
+					Use the HEX color code format: e.g. #FFFFFF
+				</div>
+				<div class="mt10">
+					Message: <input type="text" id="pixel_buy_message" size="50">
+				</div>
+				<div class="notice">
+					Be carefull. Your message will remain permanently on the blockchain.
+				</div>
+				<div class="mt10 center">
+					<button id="pixel_buy_button_metamask" class="btn">
+						get this pixel with MetaMask
+					</button>
+				</div>
+			</div>
 			<input type="hidden" id="pixel_x">
 			<input type="hidden" id="pixel_y">
 			<input type="hidden" id="pixel_number">
@@ -163,79 +184,54 @@
 			<input type="hidden" id="pixel_price">
 		</div>
 
-		<div id="get_pixel_direct">
-			<br />
-			<div class="modal_section">
-				Get this pixel by sending Ether directly
-			</div>
-			<p>
-				Get this pixel by sending the amount of Ether to the address below.
-			</p>
-<!-- 			<div class="notice">
-				Note: cannot put a message to this pixel with this method.
-			</div> -->
-			<br />
-			<table class="pixel_info_table">
-				<tr>
-					<td>contract address</td>
-					<td><input id="pixel_direct_address" size="60" readonly></td>
-				</tr>
-				<tr>
-					<td>price (ETH amount)</td>
-					<td><input id="pixel_direct_price" size="60" readonly></td>
-				</tr>
-				<tr>
-					<td>data</td>
-					<td><input id="pixel_direct_data" size="60" readonly></td>
-				</tr>
-			</table>
-		</div>
-
-		<div id="update_pixel_section">
-			<br />
-			<div class="modal_section">
+		<!-- Modal Section: Update pixel -->
+		<div id="modal_section_update_pixel" class="modal_section">
+			<div class="modal_section_title">
 				update pixel
 			</div>
-			<table>
-				<tr>
-					<td>Owner address</td>
-					<td><input type="text" id="update_owner_input" size="50"></td>
-					<td><button id="update_owner">update</button></td>
-				</tr>
-				<tr>
-					<td>Color</td>
-					<td><input type="text" id="update_color_input" placeholder="#000000"><input type="color" id="update_color_picker" placeholder="cannot use color picker" size="40"></td>
-					<td><button id="update_color">update</button></td>
-				</tr>
-				<tr>
-					<td>Message</td>
-					<td><input type="text" id="update_message_input" size="50"></td>
-					<td><button id="update_message">update</button></td>
-				</tr>
-				<tr>
-					<td>Price</td>
-					<td><input type="number" id="update_price_input"> ETH</td>
-					<td><button id="update_price">update</button></td>
-				</tr>
-				<tr>
-					<td>Sale Satatus</td>
-					<td>
-						<input type=radio name="isSale" value="true"> for sale 
-						<input type=radio name="isSale" value="false"> not for sale
-					</td>
-					<td><button id="update_sale">update</button></td>
-				</tr>
-			</table>
+			<div class="modal_section_body">
+				<table>
+					<tr>
+						<td>Owner address</td>
+						<td><input type="text" id="update_owner_input" size="50"></td>
+						<td><button id="update_owner">update</button></td>
+					</tr>
+					<tr>
+						<td>Color</td>
+						<td><input type="text" id="update_color_input" placeholder="#000000"><input type="color" id="update_color_picker" placeholder="cannot use color picker" size="40"></td>
+						<td><button id="update_color">update</button></td>
+					</tr>
+					<tr>
+						<td>Message</td>
+						<td><input type="text" id="update_message_input" size="50"></td>
+						<td><button id="update_message">update</button></td>
+					</tr>
+					<tr>
+						<td>Price</td>
+						<td><input type="number" step="0.01" id="update_price_input"> ETH</td>
+						<td><button id="update_price">update</button></td>
+					</tr>
+					<tr>
+						<td>Sale Status</td>
+						<td>
+							<input type=radio name="isSale" value="true"> for sale 
+							<input type=radio name="isSale" value="false"> not for sale
+						</td>
+						<td><button id="update_sale">update</button></td>
+					</tr>
+				</table>
+			</div>
 		</div>
 
-		<div id="transaction_result">
-			<br />
-			<div class="modal_section">
+		<div id="modal_section_transaction_result" class="modal_section">
+			<div class="modal_section_title">
 				Transaction Result
 			</div>
-			<div id="tx_result"></div>
-			<div class="notice">
-				Wait few seconds - minutes and refresh this page to check updates.
+			<div class="modal_section_body">
+				<div id="tx_result"></div>
+				<div class="notice">
+					Wait a few seconds - minutes and refresh this page to check updates.
+				</div>
 			</div>
 		</div>
 	</div>

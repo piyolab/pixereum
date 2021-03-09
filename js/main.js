@@ -63,6 +63,12 @@ function getPixelNumber(x, y) {
 	return x + y * SIZE;
 }
 
+function getCoordinate(pixelNumber) {
+	const x = pixelNumber % 100
+	const y = (pixelNumber - x) / 100
+	return [x, y]
+}
+
 function getIntColor(colorCode) {
 	colorCode = colorCode.slice(1);
 	r = parseInt(colorCode.substr(0,2), 16);
@@ -165,10 +171,9 @@ function getPixels(callback) {
 }
 
 function registerModals() {
-    $('#modal_pixel_detail').iziModal({
+  $('#modal_pixel_detail').iziModal({
 		title: 'pixel details',
 		group: "detail",
-		padding: 20,
 		width: 600,
 		fullscreen: true,
 		closeButton: true	
@@ -208,7 +213,7 @@ function showTransactionResult(result) {
 		text: "etherscan: " + result,
 		target: "_blank"
 	}));
-	$('#transaction_result').show();
+	$('#modal_section_transaction_result').show();
 }
 
 
@@ -216,7 +221,7 @@ function registerPixelBuyButton() {
 
 	$('#pixel_buy_button_metamask').click(function(e) {
 		console.log("buy width MetaMask!");
-		$('#transaction_result').hide();
+		$('#modal_section_transaction_result').hide();
 
 		if (!checkSaleStatus()) {
 			alert("This pixel is currently not for sale.");
@@ -243,54 +248,6 @@ function registerPixelBuyButton() {
 }
 
 
-function registerDirectPixelBuyButton() {
-	$('#pixel_buy_button_direct').click(function(e) {
-		console.log("buy directly!");
-
-		if (!checkSaleStatus()) {
-			alert("This pixel is currently not for sale.");
-			return;
-		}
-
-		var inputs = getPixelBuyInputs();
-		console.log(inputs);
-		var hexX = getHexCoordString(inputs.x);
-		var hexY = getHexCoordString(inputs.y);
-		var colorCode = inputs.color.slice(1);
-
-		var data = "0x" + hexX + hexY + colorCode;
-
-		$('#pixel_direct_address').val(pixereum.address);		
-		$('#pixel_direct_price').val(inputs.price);
-		$('#pixel_direct_data').val(data);
-
-		$('#get_pixel_direct').show();
-
-	});
-}
-
-
-function refreshUpdatePixelSection(pixelData) {
-	console.log("refreshUpdatePixelSection")
-	// show update section only when pixel owner's wallet is connected
-	if(!ethereum || !ethereum.selectedAddress) return;
-	if(pixelData.owner.toLowerCase() != ethereum.selectedAddress.toLowerCase()) return;
-	
-	console.log("pixelData", pixelData);
-	$('#get_pixel').hide();
-	$('#update_color_input').val('#'+pixelData.color);
-	$('#update_color_picker').val('#'+pixelData.color);
-	$('#update_message_input').val(pixelData.message);
-	$('#update_price_input').val(pixelData.ethPrice);
-	if (pixelData.isSale) {
-		$('input[name=isSale]:eq(0)').prop('checked', true);
-	} else {
-		$('input[name=isSale]:eq(1)').prop('checked', true);
-	}
-	$('#update_pixel_section').show();
-}
-
-
 function resetField(message, color) {
 	$('#pixel_buy_message').val(message);
 	$('#pixel_color_picker').val("#" + color);
@@ -298,7 +255,6 @@ function resetField(message, color) {
 }
 
 function hideDetails() {
-	$('#pixel_buy_button_direct').hide();
 	// if(pixereum.isMetaMask == true) {
 	// 	$('#pixel_buy_button_direct').hide();
 	// } else {
@@ -312,8 +268,8 @@ function hideDetails() {
 function getPixelData(x, y, callback) {
 	pixereum.contract.methods.getPixel(getPixelNumber(x, y)).call(function(error, result){
 		if(!error) {
-        	console.log(result);
-        	var pixelData = {};
+    	console.log(result);
+    	var pixelData = {};
 			pixelData.x = x;
 			pixelData.y = y;
 			pixelData.hexX = getHexCoordString(x); 
@@ -349,19 +305,6 @@ function initApp() {
 	initWeb3();
 	initContract();
 
-	getPixels(()=>{
-		addGrid(canvas, context);
-		registerModals();
-		registerCanvasClick();
-		registerMouseMove();
-		registerPixelBuyButton();
-		registerDirectPixelBuyButton();
-		registerColorPicker();
-		registerUpdateColorPicker();
-		hideDetails();
-		registerUpdateButtons();
-	});
-
 	// info_panel
 	$('#info_pixel_num').text(numPixels);
 	$('#info_pixel_x').text(0);
@@ -378,6 +321,23 @@ function initApp() {
 		});
 	    $('#modal_about').iziModal('open');
 	});
+
+	getPixels(()=>{
+		addGrid(canvas, context);
+		registerModals();
+		registerCanvasClick();
+		registerMouseMove();
+		registerPixelBuyButton();
+		registerColorPicker();
+		registerUpdateColorPicker();
+		hideDetails();
+		registerUpdateButtons();
+		const pixelNumber = getUrlParam('p')
+		if (pixelNumber >= 0 && pixelNumber < 10000) {
+			const [x, y] = getCoordinate(pixelNumber)
+			showPixelDetail(x, y)
+		}
+	});
 }
 
 
@@ -393,22 +353,35 @@ function isWalletConnected() {
 	return true
 }
 
-ethereum.on('connect', (connectInfo) => {
-	console.log("Connected to a wallet")
-	console.log(connectInfo)
-	// => {chainId: "0x3"}
-	console.log(isWalletConnected())
-})
+if (window.ethereum) {
+	window.ethereum.on('connect', (connectInfo) => {
+		console.log("Connected to a wallet")
+		console.log(connectInfo)
+		// => {chainId: "0x3"}
+		// console.log(isWalletConnected())
+	})
+
+	window.ethereum.request({ method: 'eth_accounts' })
+	.then(handleAccountsChanged)
+	.catch((err) => {
+	  console.error(err)
+	})
+
+	window.ethereum.on('accountsChanged', handleAccountsChanged)
+
+	window.ethereum.on('disconnect', (error) => {
+		console.log("Disconnected from a wallet")
+	})
+
+}
 
 // Called when account is changed / permitted
-ethereum.on('accountsChanged', (accounts) => {
+function handleAccountsChanged(accounts) {
 	console.log("Wallet account is changed")
 	updateWalletButtonViewability()
-})
+	$('#modal_pixel_detail').iziModal('close')
+}
 
-ethereum.on('disconnect', (error) => {
-	console.log("Disconnected from a wallet")
-})
 
 // **************************************
 // View-related Functions
@@ -425,13 +398,15 @@ function updateWalletButtonViewability() {
 }
 
 function hideSections() {
-	$('#get_pixel').hide()
+	$('#modal_section_connect_wallet').hide()
+	$('#modal_section_get_pixel').hide()
 	$('#get_pixel_direct').hide()
-	$('#transaction_result').hide()
-	$('#update_pixel_section').hide()
+	$('#modal_section_transaction_result').hide()
+	$('#modal_section_update_pixel').hide()
 }
 
-function updatePixelModal(pixelData) {
+function refreshPixelModal(pixelData) {
+	hideSections()
 	$('#pixel_x').val(pixelData.x)
 	$('#pixel_y').val(pixelData.y)
 	$('#pixel_number').val(pixelData.pixelNumber)
@@ -439,25 +414,60 @@ function updatePixelModal(pixelData) {
 	$('#pixel_detail_y').text(pixelData.y)
 	$('#pixel_detail_number').text(pixelData.pixelNumber)
 	$('#pixel_detail_color_hex').text(pixelData.color)
+	$('#pixel_detail_color').css({'color':`#${pixelData.color}`})
 	$('#pixel_detail_owner').text(pixelData.owner)
 	$('#pixel_detail_message').text(pixelData.message)
 	$('#pixel_detail_message').addAutoLink()
 	$('#pixel_sale_status').val(pixelData.isSale)
 	if (pixelData.isSale) {
 		$('#pixel_detail_sale_status').text("for sale")
+		$('#pixel_detail_sale_status').css({'color':`#0000FF`})
 	} else {
 		$('#pixel_detail_sale_status').text("not for sale")
+		$('#pixel_detail_sale_status').css({'color':`#FF0000`})
 	}
 	$('#pixel_detail_price').text(pixelData.ethPrice)
 	$('#pixel_price').val(pixelData.ethPrice)
 	
 	resetField(pixelData.message, pixelData.color)
-	if (isWalletConnected()) {
-		$('#pixel_buy_owner').val(window.ethereum.selectedAddress)
-	}
 
-	$('#get_pixel').show()
-	refreshUpdatePixelSection(pixelData)
+	updateWalletButtonViewability()
+
+	if(showUpdatePixelSectionWhenNeeded(pixelData)) return
+	if(showGetPixelSectionWhenNeeded(pixelData)) return
+	if(showConnectWalletSectionWhenNeeded(pixelData)) return
+
+}
+
+function showConnectWalletSectionWhenNeeded(pixelData) {
+	if (isWalletConnected()) return false
+	$('#modal_section_connect_wallet').show()
+	return true
+}
+
+function showGetPixelSectionWhenNeeded(pixelData) {
+	if (!isWalletConnected()) return false
+	if (!pixelData.isSale) return false
+	$('#pixel_buy_owner').val(window.ethereum.selectedAddress)
+	$('#modal_section_get_pixel').show()
+	return true
+}
+
+function showUpdatePixelSectionWhenNeeded(pixelData) {
+	if(!isWalletConnected()) return false
+	if(pixelData.owner.toLowerCase() != ethereum.selectedAddress.toLowerCase()) return false
+	$('#update_owner_input').val(ethereum.selectedAddress)	
+	$('#update_color_input').val('#'+pixelData.color)
+	$('#update_color_picker').val('#'+pixelData.color)
+	$('#update_message_input').val(pixelData.message)
+	$('#update_price_input').val(pixelData.ethPrice)
+	if (pixelData.isSale) {
+		$('input[name=isSale]:eq(0)').prop('checked', true)
+	} else {
+		$('input[name=isSale]:eq(1)').prop('checked', true)
+	}
+	$('#modal_section_update_pixel').show()
+	return true
 }
 
 function updateInfoPanel(e) {
@@ -491,28 +501,23 @@ async function onConnectWalletButtonClick() {
 	updateWalletButtonViewability()
 }
 
+function showPixelDetail(x, y) {
+	const pixelNumber = getPixelNumber(x, y)
+	$('#modal_pixel_detail').iziModal('open')
+	$('#modal_pixel_detail').iziModal('startLoading')
+	getPixelData(x, y, (pixelData) => {
+		history.replaceState('','',`?p=${pixelData.pixelNumber}`)
+		refreshPixelModal(pixelData)
+		$('#modal_pixel_detail').iziModal('stopLoading')
+	})
+}
+
 // Called when a pixel is clicked
 function registerCanvasClick() {
 	canvas.on('click', async function(e) {
-
-		hideSections();
-		
+		e.preventDefault()		
 		const [x, y] = getCurrentMousePosition(e)
-		console.log("x:", x, "y:", y)
-
-		var pixelNumber = getPixelNumber(x, y)
-		console.log(pixelNumber)
-
-		e.preventDefault()
-
-		$('#modal_pixel_detail').iziModal('open')
-		$('#modal_pixel_detail').iziModal('startLoading')
-
-		getPixelData(x, y, (pixelData) => {
-			updatePixelModal(pixelData)
-			$('#modal_pixel_detail').iziModal('stopLoading')
-		})
-
+		showPixelDetail(x, y)
 	})
 }
 
